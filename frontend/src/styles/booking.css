@@ -1,0 +1,445 @@
+/* ==========================================================================
+   BOOKING PAGE & CONFIRMATION STYLES
+   ========================================================================== */
+
+.booking-page {
+  padding: 48px 0 80px;
+}
+
+.booking-header {
+  margin-bottom: 36px;
+}
+
+.booking-header-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.booking-header-back:hover {
+  color: var(--text-primary);
+}
+
+.booking-header-title {
+  font-size: 2.2rem;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+}
+
+.booking-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+}
+
+.booking-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booking-meta-item strong {
+  color: var(--text-primary);
+}
+
+.booking-meta-dot {
+  color: var(--border-color);
+}
+
+/* Two-column layout */
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.booking-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+
+.booking-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.booking-card-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* Calendar Component */
+.calendar-wrap {
+  margin-bottom: 28px;
+}
+
+.calendar-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.calendar-month-title {
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.calendar-nav-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.calendar-nav-btn:hover:not(:disabled) {
+  background-color: var(--surface-subtle);
+}
+
+.calendar-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+
+.calendar-day-header {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-bottom: 10px;
+}
+
+.calendar-day-btn {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.calendar-day-btn.has-slots {
+  background-color: var(--surface-subtle);
+  border-color: var(--border-subtle);
+}
+
+.calendar-day-btn.has-slots:hover {
+  border-color: var(--accent);
+  background-color: var(--accent-light);
+}
+
+.calendar-day-btn.selected {
+  background-color: var(--accent) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border-color: var(--accent) !important;
+}
+
+.calendar-day-btn:disabled {
+  color: #C0BEB9;
+  background-color: transparent !important;
+  cursor: not-allowed;
+}
+
+.calendar-today-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  position: absolute;
+  bottom: 4px;
+}
+
+.calendar-day-btn.selected .calendar-today-indicator {
+  background-color: #FFFFFF;
+}
+
+/* Slots Section */
+.slots-section {
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.slots-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.slots-header-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.slots-timezone {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.slot-btn {
+  padding: 10px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.slot-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--accent-light);
+}
+
+.slot-btn.selected {
+  background-color: var(--accent);
+  color: #FFFFFF;
+  border-color: var(--accent);
+}
+
+.slots-empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  background-color: var(--surface-subtle);
+  border-radius: var(--radius-md);
+}
+
+/* Selection Summary Card in Form Column */
+.booking-summary-banner {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+  padding: 5px 0;
+}
+
+.summary-row.total {
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.summary-label {
+  color: var(--text-secondary);
+}
+
+.summary-val {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Trust Badges below form */
+.booking-trust-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.trust-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Confirmation Page */
+.confirmation-page {
+  padding: 60px 0 90px;
+}
+
+.confirmation-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 44px;
+}
+
+.confirmation-status-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--success-bg);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.confirmation-title {
+  font-size: 2.2rem;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+}
+
+.confirmation-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.confirmation-details-box {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.confirmation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px;
+}
+
+.confirmation-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conf-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.conf-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.conf-meet-banner {
+  background-color: #FFF7F0;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.meet-info-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #9A4106;
+  margin-bottom: 4px;
+}
+
+.meet-info-desc {
+  font-size: 0.92rem;
+  color: #723408;
+}
+
+.conf-questions-box {
+  margin-bottom: 32px;
+}
+
+.conf-questions-content {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.conf-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Responsiveness */
+@media (max-width: 860px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+  .confirmation-grid {
+    grid-template-columns: 1fr;
+  }
+  .confirmation-card {
+    padding: 30px 20px;
+  }
+}

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /book
+Allow: /cancellation-refund
+Allow: /privacy-policy
+Allow: /terms
+
+# Disallow private admin routes and customer-specific confirmation pages
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /confirmation/*
+
+Sitemap: https://harsha.dev/sitemap.xml

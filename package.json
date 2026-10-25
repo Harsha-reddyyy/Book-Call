@@ -1,0 +1,17 @@
+{
+  "name": "call-book",
+  "version": "1.0.0",
+  "description": "Personal Consultation Booking Platform for Harsha",
+  "private": true,
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "server": "node backend/src/server.js",
+    "client": "npm --prefix frontend run dev",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "build": "npm --prefix frontend run build && npm --prefix backend install",
+    "test": "npm --prefix backend test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
