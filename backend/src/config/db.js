@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
 let memServer = null;
@@ -9,6 +16,13 @@ export const connectDB = async () => {
 
   try {
     if (mongoUri && mongoUri.trim() !== '') {
+      if (/<[^>]+>/.test(mongoUri)) {
+        console.warn('\n⚠️  [Database Warning] MONGODB_URI contains template placeholders (like <db_username> or <password>).');
+        console.warn('👉 In MongoDB Atlas -> "Database Access", find or create a user and replace <db_username> with that username in backend/.env.');
+        console.warn('👉 Example: mongodb+srv://myUser:myPassword@cluster0.dzjwdl4.mongodb.net/callbook?retryWrites=true&w=majority\n');
+        throw new Error('MONGODB_URI contains unreplaced placeholder tokens (e.g. <db_username>)');
+      }
+
       await mongoose.connect(mongoUri, {
         serverSelectionTimeoutMS: 5000,
       });
@@ -24,7 +38,9 @@ export const connectDB = async () => {
     await mongoose.connect(uri);
     console.log(`[Database] Connected to in-memory MongoDB at ${uri}`);
   } catch (error) {
-    console.error('[Database] MongoDB connection error:', error.message);
+    if (!error.message.includes('unreplaced placeholder tokens')) {
+      console.error('[Database] MongoDB connection error:', error.message);
+    }
     // If external URI failed, try memory server as fallback for resilience
     try {
       console.log('[Database] Attempting fallback to in-memory MongoDB instance...');

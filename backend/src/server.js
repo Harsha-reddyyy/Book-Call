@@ -1,6 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
 import { connectDB } from './config/db.js';
@@ -100,16 +107,28 @@ export async function startServer() {
     await connectDB();
     await ensureDefaultAdminAndData();
 
-    const server = app.listen(PORT, () => {
-      console.log(`===============================================`);
-      console.log(`⚡ Harsha Booking Backend running on port ${PORT}`);
-      console.log(`📍 API Base: http://localhost:${PORT}/api`);
-      console.log(`===============================================`);
+    const server = await new Promise((resolve, reject) => {
+      const s = app.listen(PORT, () => {
+        console.log(`===============================================`);
+        console.log(`⚡ Harsha Booking Backend running on port ${PORT}`);
+        console.log(`📍 API Base: http://localhost:${PORT}/api`);
+        console.log(`===============================================`);
+        resolve(s);
+      });
+
+      s.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.error(`\n❌ [Server Error] Port ${PORT} is already in use by another running process.`);
+          console.error(`💡 Tip: Close the other terminal running the server, or kill the process using 'lsof -ti :${PORT} | xargs kill -9'\n`);
+        } else {
+          console.error('[Server Error]', err.message);
+        }
+        reject(err);
+      });
     });
 
     return { app, server };
   } catch (err) {
-    console.error('Failed to start server:', err);
     process.exit(1);
   }
 }
