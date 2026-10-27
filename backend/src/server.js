@@ -62,11 +62,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health Check
 app.get('/api/health', (req, res) => {
+  const rzpKey = process.env.RAZORPAY_KEY_ID?.trim();
+  const rzpSec = process.env.RAZORPAY_KEY_SECRET?.trim();
   res.json({
     status: 'ok',
     service: 'Harsha Consultation Booking API',
     time: new Date().toISOString(),
     uptime: process.uptime(),
+    razorpay: {
+      configured: Boolean(rzpKey && rzpSec),
+      keyIdPrefix: rzpKey ? `${rzpKey.substring(0, 12)}...` : 'missing',
+      secretLength: rzpSec ? rzpSec.length : 0,
+    },
   });
 });
 

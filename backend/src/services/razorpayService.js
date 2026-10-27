@@ -4,9 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const sanitizeEnv = (val) => val?.trim().replace(/^['"]|['"]$/g, '');
-const keyId = sanitizeEnv(process.env.RAZORPAY_KEY_ID);
-const keySecret = sanitizeEnv(process.env.RAZORPAY_KEY_SECRET);
-const webhookSecret = sanitizeEnv(process.env.RAZORPAY_WEBHOOK_SECRET);
+const keyId = sanitizeEnv(process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY);
+const keySecret = sanitizeEnv(process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET);
+const webhookSecret = sanitizeEnv(process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_WEBHOOK);
 
 // Helper to determine if real Razorpay keys are configured
 export const isRazorpayConfigured = () => {
