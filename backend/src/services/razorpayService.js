@@ -3,9 +3,10 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const keyId = process.env.RAZORPAY_KEY_ID;
-const keySecret = process.env.RAZORPAY_KEY_SECRET;
-const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+const sanitizeEnv = (val) => val?.trim().replace(/^['"]|['"]$/g, '');
+const keyId = sanitizeEnv(process.env.RAZORPAY_KEY_ID);
+const keySecret = sanitizeEnv(process.env.RAZORPAY_KEY_SECRET);
+const webhookSecret = sanitizeEnv(process.env.RAZORPAY_WEBHOOK_SECRET);
 
 // Helper to determine if real Razorpay keys are configured
 export const isRazorpayConfigured = () => {
@@ -54,7 +55,8 @@ export async function createPaymentOrder(bookingId, amountPaise = 39900, notes =
       };
     } catch (err) {
       console.error('[Razorpay] Order creation failed:', err);
-      throw new Error(`Razorpay order creation failed: ${err.message}`);
+      const desc = err.error?.description || err.message || JSON.stringify(err);
+      throw new Error(`Razorpay order creation failed: ${desc}`);
     }
   }
 
