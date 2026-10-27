@@ -14,7 +14,9 @@ export const isRazorpayConfigured = () => {
     keyId &&
     keySecret &&
     !keyId.includes('YOUR_') &&
-    !keySecret.includes('YOUR_')
+    !keySecret.includes('YOUR_') &&
+    !keyId.includes('mock') &&
+    !keySecret.includes('mock')
   );
 };
 
