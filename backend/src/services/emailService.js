@@ -3,11 +3,16 @@ import { format as formatZoned } from 'date-fns-tz';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const emailFrom = process.env.EMAIL_FROM || 'Harsha Consultations <bookings@harshacreator.com>';
+const sanitizeEnv = (val) => val?.trim().replace(/^['"]|['"]$/g, '');
+const resendApiKey = sanitizeEnv(process.env.RESEND_API_KEY);
+const emailFrom = sanitizeEnv(process.env.EMAIL_FROM) || 'Harsha Consultations <onboarding@resend.dev>';
 
 export const isResendConfigured = () => {
-  return Boolean(resendApiKey && !resendApiKey.includes('YOUR_'));
+  return Boolean(
+    resendApiKey &&
+    !resendApiKey.includes('YOUR_') &&
+    !resendApiKey.includes('placeholder')
+  );
 };
 
 const resend = isResendConfigured() ? new Resend(resendApiKey) : null;
@@ -192,6 +197,26 @@ export async function sendBookingConfirmation(booking) {
         subject,
         html,
       });
+
+      if (response.error) {
+        console.warn('[Email Warning]', response.error.message);
+        // If testing in sandbox (onboarding@resend.dev), forward notification to admin so Harsha always gets it
+        const adminEmail = process.env.ADMIN_DEFAULT_EMAIL || 'harshavardhanreddy.0712@gmail.com';
+        if (booking.customerEmail !== adminEmail) {
+          try {
+            await resend.emails.send({
+              from: emailFrom,
+              to: [adminEmail],
+              subject: `[Admin Alert] New Consultation Booked — ${booking.bookingId}`,
+              html,
+            });
+            console.log(`[Email] Admin notification delivered to ${adminEmail}`);
+          } catch (adminErr) {
+            console.warn('[Email Admin Fallback Error]', adminErr.message);
+          }
+        }
+        return { success: false, emailId: null, error: response.error.message };
+      }
 
       console.log(`[Email] Confirmation sent to ${booking.customerEmail} (ID: ${response.data?.id})`);
       return { success: true, emailId: response.data?.id, error: null };

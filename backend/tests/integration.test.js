@@ -12,6 +12,7 @@ import jwt from 'jsonwebtoken';
 describe('End-to-End Booking Lifecycle & Concurrency Integration', () => {
   before(async () => {
     await connectDB();
+    await Booking.deleteMany({ bookingId: /^BK-TEST/ });
     await Availability.getEffectiveSettings();
   });
 

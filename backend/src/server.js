@@ -64,6 +64,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api/health', (req, res) => {
   const rzpKey = process.env.RAZORPAY_KEY_ID?.trim();
   const rzpSec = process.env.RAZORPAY_KEY_SECRET?.trim();
+  const resendKey = process.env.RESEND_API_KEY?.trim();
   res.json({
     status: 'ok',
     service: 'Harsha Consultation Booking API',
@@ -73,6 +74,11 @@ app.get('/api/health', (req, res) => {
       configured: Boolean(rzpKey && rzpSec),
       keyIdPrefix: rzpKey ? `${rzpKey.substring(0, 12)}...` : 'missing',
       secretLength: rzpSec ? rzpSec.length : 0,
+    },
+    email: {
+      configured: Boolean(resendKey && !resendKey.includes('placeholder')),
+      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+      keyPrefix: resendKey ? `${resendKey.substring(0, 6)}...` : 'missing',
     },
   });
 });
