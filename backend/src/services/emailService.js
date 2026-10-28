@@ -5,10 +5,20 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const sanitizeEnv = (val) => val?.trim().replace(/^['"]|['"]$/g, '');
+const brevoApiKey = sanitizeEnv(process.env.BREVO_API_KEY);
+const brevoSenderEmail = sanitizeEnv(process.env.BREVO_SENDER_EMAIL || process.env.GMAIL_USER || 'harshavardhanreddy.0712@gmail.com');
 const resendApiKey = sanitizeEnv(process.env.RESEND_API_KEY);
 const emailFrom = sanitizeEnv(process.env.EMAIL_FROM) || 'Harsha Consultations <onboarding@resend.dev>';
 const gmailUser = sanitizeEnv(process.env.GMAIL_USER);
 const gmailAppPassword = sanitizeEnv(process.env.GMAIL_APP_PASSWORD)?.replace(/\s+/g, '');
+
+export const isBrevoConfigured = () => {
+  return Boolean(
+    brevoApiKey &&
+    !brevoApiKey.includes('YOUR_') &&
+    !brevoApiKey.includes('placeholder')
+  );
+};
 
 export const isGmailConfigured = () => {
   return Boolean(
@@ -213,7 +223,46 @@ export async function sendBookingConfirmation(booking) {
   const subject = `Confirmed: Consultation with Harsha — ${booking.bookingId}`;
   const html = buildConfirmationHtml(booking);
 
-  // 1. Prioritize Gmail SMTP if configured (sends to ANY customer email)
+  // 1. Brevo HTTPS API (Top priority: port 443, reliable on Render free tier, sends to any recipient)
+  if (isBrevoConfigured()) {
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: {
+            name: 'Harsha Consultations',
+            email: brevoSenderEmail,
+          },
+          to: [
+            {
+              email: booking.customerEmail,
+              name: booking.customerName || 'Valued Client',
+            },
+          ],
+          subject,
+          htmlContent: html,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `Brevo API HTTP ${response.status}`);
+      }
+
+      console.log(`[Email] Brevo confirmation delivered to ${booking.customerEmail} (MessageId: ${data.messageId})`);
+      return { success: true, emailId: data.messageId, error: null };
+    } catch (err) {
+      console.error('[Brevo Error] Failed to send email:', err.message);
+      // Fall through to other providers
+    }
+  }
+
+  // 2. Gmail SMTP if configured
   if (isGmailConfigured() && gmailTransporter) {
     try {
       const fromHeader = `"Harsha Consultations" <${gmailUser}>`;

@@ -76,9 +76,9 @@ app.get('/api/health', (req, res) => {
       secretLength: rzpSec ? rzpSec.length : 0,
     },
     email: {
-      provider: process.env.GMAIL_USER ? 'gmail_smtp' : resendKey ? 'resend' : 'mock',
-      configured: Boolean((process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) || (resendKey && !resendKey.includes('placeholder'))),
-      gmailUser: process.env.GMAIL_USER ? `${process.env.GMAIL_USER.substring(0, 5)}...` : undefined,
+      provider: process.env.BREVO_API_KEY ? 'brevo_api' : process.env.GMAIL_USER ? 'gmail_smtp' : resendKey ? 'resend' : 'mock',
+      configured: Boolean(process.env.BREVO_API_KEY || (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) || (resendKey && !resendKey.includes('placeholder'))),
+      brevoSender: process.env.BREVO_SENDER_EMAIL || process.env.GMAIL_USER || undefined,
       from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
     },
   });
