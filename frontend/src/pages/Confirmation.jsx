@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import {
   Check,
   Calendar,
@@ -21,11 +21,99 @@ import { api } from '../services/api';
 
 export default function Confirmation() {
   const { bookingId } = useParams();
-  const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const [booking, setBooking] = useState(location.state?.booking || null);
+  const [loading, setLoading] = useState(!location.state?.booking);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(null);
+  const [highlightBanner, setHighlightBanner] = useState(false);
+
+  const meetBannerRef = useRef(null);
+  const userScrolledRef = useRef(false);
+
+  // Detect manual user touch/scroll so we don't disrupt them
+  useEffect(() => {
+    const handleUserScroll = () => {
+      userScrolledRef.current = true;
+    };
+    window.addEventListener('touchstart', handleUserScroll, { passive: true });
+    window.addEventListener('wheel', handleUserScroll, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', handleUserScroll);
+      window.removeEventListener('wheel', handleUserScroll);
+    };
+  }, []);
+
+  // Smooth scroll up to the meeting link
+  const scrollToMeet = (smooth = true) => {
+    if (meetBannerRef.current) {
+      try {
+        meetBannerRef.current.scrollIntoView({
+          behavior: smooth ? 'smooth' : 'auto',
+          block: 'center',
+        });
+      } catch {
+        const rect = meetBannerRef.current.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetY = rect.top + scrollTop - 80;
+        window.scrollTo({
+          top: Math.max(0, targetY),
+          behavior: smooth ? 'smooth' : 'auto',
+        });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+    }
+  };
+
+  // Scroll to meeting link when booking loads or changes
+  useEffect(() => {
+    if (!loading && booking) {
+      // 1. Initial smooth scroll to meeting banner
+      const timer1 = setTimeout(() => {
+        scrollToMeet(true);
+        setHighlightBanner(true);
+      }, 100);
+
+      // 2. Mobile safety re-check: in case mobile keyboard or checkout modal was still collapsing
+      const timer2 = setTimeout(() => {
+        if (!userScrolledRef.current && meetBannerRef.current) {
+          const rect = meetBannerRef.current.getBoundingClientRect();
+          // If banner is out of visible viewport or still scrolled down
+          if (rect.top < 0 || rect.bottom > window.innerHeight) {
+            scrollToMeet(true);
+          }
+        }
+      }, 450);
+
+      const timer3 = setTimeout(() => {
+        setHighlightBanner(false);
+      }, 2500);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [loading, booking]);
+
+  // Trigger celebration confetti
+  useEffect(() => {
+    if (booking) {
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#F47721', '#202020', '#E8E5DF'],
+        });
+      } catch {
+        // Ignore confetti error if unavailable
+      }
+    }
+  }, [booking?.bookingId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -35,24 +123,12 @@ export default function Confirmation() {
         if (isMounted) {
           if (res.success && res.booking) {
             setBooking(res.booking);
-
-            // Subtle celebration confetti
-            try {
-              confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.6 },
-                colors: ['#F47721', '#202020', '#E8E5DF'],
-              });
-            } catch {
-              // Ignore confetti error if unavailable
-            }
-          } else {
+          } else if (!booking) {
             setError(res.message || 'Booking not found');
           }
         }
       } catch (err) {
-        if (isMounted) setError(err.message);
+        if (isMounted && !booking) setError(err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -166,7 +242,11 @@ export default function Confirmation() {
 
             {/* Google Meet Banner */}
             {booking.googleMeetUrl ? (
-              <div className="conf-meet-banner">
+              <div
+                className={`conf-meet-banner ${highlightBanner ? 'highlight-pulse' : ''}`}
+                ref={meetBannerRef}
+                id="meet-banner"
+              >
                 <div className="meet-info-text">
                   <div className="meet-info-title">Google Meet Conference Ready</div>
                   <div className="meet-info-desc">
@@ -218,7 +298,11 @@ export default function Confirmation() {
                 </div>
               </div>
             ) : (
-              <div className="conf-meet-banner pending">
+              <div
+                className={`conf-meet-banner pending ${highlightBanner ? 'highlight-pulse' : ''}`}
+                ref={meetBannerRef}
+                id="meet-banner"
+              >
                 <div className="meet-info-text">
                   <div className="meet-info-title" style={{ color: 'var(--text-primary)' }}>Meeting Link Pending</div>
                   <div className="meet-info-desc" style={{ color: 'var(--text-secondary)' }}>

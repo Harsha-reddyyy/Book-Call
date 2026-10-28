@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, ChevronRight, MessageSquare, HelpCircle, User, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronRight, MessageSquare, HelpCircle, User, Sparkles, Youtube, Instagram } from 'lucide-react';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -124,6 +124,30 @@ export default function Navbar() {
 
           {/* Header Actions Area (Desktop CTA & Mobile/Tablet Controls) */}
           <div className="nav-actions-wrap">
+            {/* Desktop Social Links */}
+            <div className="nav-social-icons">
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-social-btn yt"
+                title="Harsha Talks on YouTube (148K+ Subscribers)"
+                aria-label="YouTube Channel"
+              >
+                <Youtube size={18} />
+              </a>
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-social-btn insta"
+                title="Harsha on Instagram (@harsha.talkss)"
+                aria-label="Instagram Profile"
+              >
+                <Instagram size={18} />
+              </a>
+            </div>
+
             {/* Direct Compact CTA visible on Mobile & Tablet for fast 1-tap booking */}
             <Link to="/book" className="btn btn-primary nav-mobile-cta" aria-label="Book Call Early Bird ₹299">
               <span>Book</span>
@@ -299,6 +323,30 @@ export default function Navbar() {
               </>
             )}
           </nav>
+
+          <div className="mobile-drawer-socials">
+            <span className="mobile-social-label">Follow Harsha</span>
+            <div className="mobile-social-row">
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-social-pill yt"
+              >
+                <Youtube size={15} />
+                <span>YouTube (148K+)</span>
+              </a>
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-social-pill insta"
+              >
+                <Instagram size={15} />
+                <span>@harsha.talkss</span>
+              </a>
+            </div>
+          </div>
         </div>
 
         <div className="mobile-drawer-footer">

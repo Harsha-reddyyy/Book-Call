@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Youtube, Instagram } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -17,6 +18,28 @@ export default function Footer() {
               One-on-one personal consultation sessions for aspiring creators,
               YouTubers, and people building with AI tools.
             </p>
+            <div className="footer-social-row">
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-icon-btn yt"
+                aria-label="Harsha Talks YouTube Channel"
+                title="Harsha Talks on YouTube (148K+ Subscribers)"
+              >
+                <Youtube size={17} />
+              </a>
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-icon-btn insta"
+                aria-label="Harsha Instagram Profile"
+                title="Harsha on Instagram (@harsha.talkss)"
+              >
+                <Instagram size={17} />
+              </a>
+            </div>
           </div>
 
           <div className="footer-links-group">
@@ -32,20 +55,22 @@ export default function Footer() {
             <div className="footer-col">
               <span className="footer-col-title">Connect</span>
               <a
-                href="https://instagram.com"
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="footer-link"
+                className="footer-link footer-social-link"
               >
-                Instagram (@harshatalks)
+                <Youtube size={15} />
+                <span>YouTube (Harsha Talks)</span>
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.instagram.com/harsha.talkss/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="footer-link"
+                className="footer-link footer-social-link"
               >
-                YouTube (Harsha Talks)
+                <Instagram size={15} />
+                <span>Instagram (@harsha.talkss)</span>
               </a>
               <a href="mailto:harsha@example.com" className="footer-link">
                 harsha@example.com

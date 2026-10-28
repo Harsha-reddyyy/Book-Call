@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Clock, Calendar, TrendingUp } from 'lucide-react';
+import { Award, Clock, Calendar, TrendingUp, Youtube, Instagram, ExternalLink } from 'lucide-react';
 
 export default function About() {
   return (
@@ -25,11 +25,56 @@ export default function About() {
             <p className="about-quote">
               "Started on December 28, 2025. Grew from zero to 148,000+ YouTube subscribers and 25,000+ Instagram followers in under a year."
             </p>
+
+            {/* Verified Social Profile Links */}
+            <div className="about-social-links">
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-social-btn yt"
+                title="Visit Harsha Talks on YouTube"
+              >
+                <Youtube size={16} />
+                <span>YouTube (148K+ Subs)</span>
+                <ExternalLink size={13} />
+              </a>
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-social-btn insta"
+                title="Visit @harsha.talkss on Instagram"
+              >
+                <Instagram size={16} />
+                <span>Instagram (@harsha.talkss)</span>
+                <ExternalLink size={13} />
+              </a>
+            </div>
+
             <p className="about-p">
               I run <strong>Harsha Talks</strong>. When I started out, I had the exact same questions you might have right now: <em>Which AI tools should I use? How do I write scripts? How do I edit videos that people actually watch? How do I grow without wasting months?</em>
             </p>
             <p className="about-p">
-              Every day, hundreds of creators message me in YouTube comments and Instagram DMs asking for advice. It's impossible to give complete answers in text messages. That's why I started these 1-on-1 calls — to give you <strong>30–40 dedicated minutes directly with me on Google Meet</strong>. We talk in simple, clear English and solve whatever is stopping your progress.
+              Every day, hundreds of creators message me in{' '}
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-inline-link"
+              >
+                YouTube comments
+              </a>{' '}
+              and{' '}
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-inline-link"
+              >
+                Instagram DMs (@harsha.talkss)
+              </a>{' '}
+              asking for advice. It's impossible to give complete answers in text messages. That's why I started these 1-on-1 calls — to give you <strong>30–40 dedicated minutes directly with me on Google Meet</strong>. We talk in simple, clear English and solve whatever is stopping your progress.
             </p>
 
             <div className="about-highlights-grid">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2, Youtube, Instagram } from 'lucide-react';
 
 export default function Hero() {
   const scrollToTopics = (e) => {
@@ -25,7 +25,27 @@ export default function Hero() {
             </h1>
 
             <p className="hero-lead">
-              I started from zero on December 28, 2025, and grew to <strong>148K+ YouTube subscribers</strong> and <strong>25K+ Instagram followers</strong>. Got doubts about AI tools, video editing, scripts, or channel growth? Book a personal 1-on-1 call with me and let's solve your questions in simple, easy-to-understand English.
+              I started from zero on December 28, 2025, and grew to{' '}
+              <a
+                href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hero-inline-link"
+                title="Harsha Talks on YouTube"
+              >
+                <strong>148K+ YouTube subscribers</strong>
+              </a>{' '}
+              and{' '}
+              <a
+                href="https://www.instagram.com/harsha.talkss/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hero-inline-link"
+                title="Harsha on Instagram (@harsha.talkss)"
+              >
+                <strong>25K+ Instagram followers</strong>
+              </a>
+              . Got doubts about AI tools, video editing, scripts, or channel growth? Book a personal 1-on-1 call with me and let's solve your questions in simple, easy-to-understand English.
             </p>
 
             {/* Early Bird Offer Card */}
@@ -114,7 +134,29 @@ export default function Hero() {
                   <span className="author-name">Harsha Talks</span>
                   <span className="author-title">148K YouTube · 25K+ Instagram · 1-on-1 Call</span>
                 </div>
-                <span className="verified-pill">✓ Verified</span>
+                <div className="hero-social-actions">
+                  <a
+                    href="https://www.youtube.com/channel/UCcukkiTsu5t03apS0xdVrpg/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hero-social-btn yt"
+                    title="Harsha Talks on YouTube (148K+ Subscribers)"
+                    aria-label="YouTube Channel"
+                  >
+                    <Youtube size={15} />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/harsha.talkss/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hero-social-btn insta"
+                    title="Harsha on Instagram (@harsha.talkss)"
+                    aria-label="Instagram Profile"
+                  >
+                    <Instagram size={15} />
+                  </a>
+                  <span className="verified-pill">✓ Verified</span>
+                </div>
               </div>
             </div>
           </div>

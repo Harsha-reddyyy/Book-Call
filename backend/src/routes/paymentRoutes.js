@@ -132,6 +132,7 @@ router.post('/verify', async (req, res, next) => {
         customerName: updatedBooking.customerName,
         customerEmail: updatedBooking.customerEmail,
         selectedTopic: updatedBooking.selectedTopic,
+        customerQuestions: updatedBooking.customerQuestions,
         startTime: updatedBooking.startTime,
         endTime: updatedBooking.endTime,
         timeZone: updatedBooking.timeZone,

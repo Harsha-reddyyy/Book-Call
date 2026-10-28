@@ -159,7 +159,15 @@ export default function Booking() {
               });
 
               if (verifyRes.success) {
-                navigate(`/confirmation/${reservation.bookingId}`);
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                  document.activeElement.blur();
+                }
+                navigate(`/confirmation/${reservation.bookingId}`, {
+                  state: {
+                    booking: verifyRes.booking,
+                    fromPayment: true,
+                  },
+                });
               } else {
                 throw new Error(verifyRes.message || 'Payment verification failed.');
               }
@@ -222,7 +230,15 @@ export default function Booking() {
 
       if (verifyRes.success) {
         setMockPaymentModal(null);
-        navigate(`/confirmation/${mockPaymentModal.bookingId}`);
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+          document.activeElement.blur();
+        }
+        navigate(`/confirmation/${mockPaymentModal.bookingId}`, {
+          state: {
+            booking: verifyRes.booking,
+            fromPayment: true,
+          },
+        });
       } else {
         throw new Error(verifyRes.message || 'Simulated verification failed.');
       }
