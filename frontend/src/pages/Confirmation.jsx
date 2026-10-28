@@ -11,6 +11,7 @@ import {
   Mail,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import Navbar from '../components/Navbar';
@@ -110,7 +111,7 @@ export default function Confirmation() {
         <Navbar />
         <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
           <h2>Booking Not Found</h2>
-          <p style={{ margin: '16px 0 24px' }}>
+          <p style={{ margin: '16px 0 24px', color: 'var(--text-secondary)' }}>
             We could not find a confirmed booking with reference {bookingId}.
           </p>
           <Link to="/book" className="btn btn-primary">
@@ -160,26 +161,25 @@ export default function Confirmation() {
 
             <h1 className="confirmation-title">You're on the calendar!</h1>
             <p className="confirmation-subtitle">
-              Your 1-on-1 consultation call with Harsha is confirmed. We sent a
-              confirmation email with meeting details to <strong>{booking.customerEmail}</strong>.
+              Your 1-on-1 consultation call with Harsha is confirmed. We sent meeting details and invite to <strong>{booking.customerEmail}</strong>.
             </p>
 
             {/* Google Meet Banner */}
             {booking.googleMeetUrl ? (
               <div className="conf-meet-banner">
-                <div>
+                <div className="meet-info-text">
                   <div className="meet-info-title">Google Meet Conference Ready</div>
                   <div className="meet-info-desc">
-                    Click below to open the meeting room at the scheduled time.
+                    Click below to join the meeting room at your scheduled time.
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div className="conf-meet-actions">
                   <a
                     href={booking.googleMeetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-primary"
+                    className="btn btn-primary conf-btn-join"
                   >
                     <span>Join Google Meet</span>
                     <ExternalLink size={16} />
@@ -189,49 +189,62 @@ export default function Confirmation() {
                     href={getGoogleCalendarUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary conf-btn-cal"
                     title="Add to Google Calendar"
                   >
                     <Calendar size={16} />
-                    <span>Add to Calendar (30m reminder)</span>
+                    <span>Add to Calendar</span>
                   </a>
 
                   <button
                     type="button"
                     onClick={copyMeetLink}
-                    className="btn btn-subtle"
+                    className="btn btn-subtle conf-btn-copy"
                     title="Copy Meeting Link"
+                    aria-label="Copy meeting link"
                   >
-                    {copied ? <CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> : <Copy size={16} />}
+                    {copied ? (
+                      <>
+                        <CheckCircle2 size={16} style={{ color: 'var(--success)' }} />
+                        <span className="copy-btn-label">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        <span className="copy-btn-label">Copy Link</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="conf-meet-banner" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border-color)' }}>
-                <div>
+              <div className="conf-meet-banner pending">
+                <div className="meet-info-text">
                   <div className="meet-info-title" style={{ color: 'var(--text-primary)' }}>Meeting Link Pending</div>
                   <div className="meet-info-desc" style={{ color: 'var(--text-secondary)' }}>
-                    Your meeting details will be delivered directly to your email shortly.
+                    Your Google Meet link will be generated and delivered directly to your email shortly.
                   </div>
                 </div>
-                <a
-                  href={getGoogleCalendarUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary"
-                >
-                  <Calendar size={16} />
-                  <span>Add to Calendar (30m reminder)</span>
-                </a>
+                <div className="conf-meet-actions">
+                  <a
+                    href={getGoogleCalendarUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary conf-btn-cal"
+                  >
+                    <Calendar size={16} />
+                    <span>Add to Calendar</span>
+                  </a>
+                </div>
               </div>
             )}
 
-            {/* Appointment Details Table */}
+            {/* Appointment Details Grid */}
             <div className="confirmation-details-box">
               <div className="confirmation-grid">
                 <div className="confirmation-detail-item">
                   <span className="conf-label">Booking Reference</span>
-                  <span className="conf-value" style={{ fontFamily: 'var(--font-mono)' }}>
+                  <span className="conf-value conf-value-mono">
                     {booking.bookingId}
                   </span>
                 </div>
@@ -255,7 +268,7 @@ export default function Confirmation() {
 
                 <div className="confirmation-detail-item">
                   <span className="conf-label">Duration</span>
-                  <span className="conf-value">30–40 minutes (1-on-1 Deep Dive)</span>
+                  <span className="conf-value">30–40 minutes (1-on-1)</span>
                 </div>
 
                 <div className="confirmation-detail-item">
@@ -276,20 +289,20 @@ export default function Confirmation() {
             </div>
 
             {/* Instructions & Next Steps */}
-            <div style={{ marginBottom: '32px', fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-              <p style={{ marginBottom: '10px' }}>
-                <strong>Tips for our call:</strong>
+            <div className="conf-tips-box">
+              <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
+                Tips for your 1-on-1 session:
               </p>
-              <ul style={{ paddingLeft: '20px' }}>
-                <li style={{ marginBottom: '6px' }}>
-                  Please test your microphone and camera a couple of minutes before the start time.
+              <ul className="conf-tips-list">
+                <li>
+                  Test your microphone and camera 2-3 minutes before start time.
                 </li>
-                <li style={{ marginBottom: '6px' }}>
-                  If you have video links, channel links, or draft ideas, please have them ready to share in chat.
+                <li>
+                  If you have video links, channel links, or draft ideas, please have them ready to paste in Google Meet chat.
                 </li>
                 <li>
                   Need to reschedule? Refer to our{' '}
-                  <Link to="/cancellation-refund" style={{ color: 'var(--accent)' }}>
+                  <Link to="/cancellation-refund" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
                     Cancellation & Refund Policy
                   </Link>
                   .
@@ -298,8 +311,11 @@ export default function Confirmation() {
             </div>
 
             <div className="conf-actions">
-              <Link to="/" className="btn btn-secondary">
-                Back to Homepage
+              <Link to="/" className="btn btn-secondary conf-btn-home">
+                <span>Back to Homepage</span>
+              </Link>
+              <Link to="/book" className="btn btn-subtle">
+                <span>Book Another Call</span>
               </Link>
             </div>
           </div>

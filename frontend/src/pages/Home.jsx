@@ -7,6 +7,7 @@ import About from '../components/About';
 import FAQ from '../components/FAQ';
 import CTA from '../components/CTA';
 import Footer from '../components/Footer';
+import MobileStickyBar from '../components/MobileStickyBar';
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
         <CTA />
       </main>
       <Footer />
+      <MobileStickyBar />
     </div>
   );
 }

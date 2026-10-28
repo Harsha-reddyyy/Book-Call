@@ -1,50 +1,55 @@
 /* ==========================================================================
-   POLICY & LEGAL PAGES STYLES
+   POLICY & LEGAL PAGES STYLES - RESPONSIVE DESIGN
    ========================================================================== */
 
 .policy-page {
-  padding: 60px 0 100px;
+  padding: 48px 0 80px;
 }
 
 .policy-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 56px 48px;
+  padding: 48px 40px;
+  box-shadow: var(--shadow-subtle);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .policy-header {
-  margin-bottom: 36px;
-  padding-bottom: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .policy-title {
-  font-size: 2.4rem;
+  font-size: clamp(1.85rem, 4vw, 2.4rem);
   letter-spacing: -0.03em;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  line-height: 1.2;
 }
 
 .policy-meta {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-muted);
 }
 
 .policy-body {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   line-height: 1.75;
   color: #363636;
+  word-break: break-word;
 }
 
 .policy-body h3 {
-  font-size: 1.3rem;
-  margin-top: 36px;
+  font-size: 1.25rem;
+  margin-top: 32px;
   margin-bottom: 12px;
   color: var(--text-primary);
 }
 
 .policy-body p {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   color: #4A4A4A;
 }
 
@@ -62,11 +67,23 @@
   color: var(--text-primary);
 }
 
-@media (max-width: 680px) {
-  .policy-card {
-    padding: 32px 20px;
+@media (max-width: 768px) {
+  .policy-page {
+    padding: 24px 0 56px;
   }
-  .policy-title {
-    font-size: 1.85rem;
+  .policy-card {
+    padding: 24px 18px;
+    border-radius: var(--radius-md);
+  }
+  .policy-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+  .policy-body {
+    font-size: 0.96rem;
+    line-height: 1.65;
+  }
+  .policy-body ul {
+    padding-left: 20px;
   }
 }

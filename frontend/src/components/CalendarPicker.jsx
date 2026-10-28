@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Clock, Loader2, Calendar as CalIcon } from '
 import { api } from '../services/api';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_SHORT = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -113,9 +114,7 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
   };
 
   // Build grid calendar
-  // 1. First day of month day-of-week
   const firstDayOfWeek = new Date(currentYear, currentMonth - 1, 1).getDay();
-  // 2. Days in month
   const totalDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
   const handleDateClick = (dateStr) => {
@@ -133,7 +132,7 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
         <h3 className="calendar-month-title">
           {MONTHS[currentMonth - 1]} {currentYear}
         </h3>
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div className="calendar-nav-controls">
           <button
             type="button"
             className="calendar-nav-btn"
@@ -156,15 +155,16 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
 
       {/* Weekday Labels */}
       <div className="calendar-grid">
-        {DAYS.map((d) => (
+        {DAYS.map((d, idx) => (
           <div key={d} className="calendar-day-header">
-            {d}
+            <span className="cal-day-full">{d}</span>
+            <span className="cal-day-mini">{DAYS_SHORT[idx]}</span>
           </div>
         ))}
 
         {/* Empty cells before day 1 */}
         {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-          <div key={`empty-${i}`} />
+          <div key={`empty-${i}`} className="calendar-day-empty" aria-hidden="true" />
         ))}
 
         {/* Calendar Day Buttons */}
@@ -202,7 +202,7 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
         <div className="slots-header">
           <span className="slots-header-title">
             {selectedDate ? (
-              <>Available times for {(() => {
+              <>Times for {(() => {
                 const [y, m, d] = selectedDate.split('-').map(Number);
                 return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
               })()}</>
@@ -210,11 +210,11 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
               'Select a date to view available times'
             )}
           </span>
-          <span className="slots-timezone">Timezone: IST (UTC+05:30)</span>
+          <span className="slots-timezone">IST (UTC+05:30)</span>
         </div>
 
         {loadingSlots ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '28px 0' }}>
             <Loader2 className="animate-spin" size={24} style={{ color: 'var(--accent)' }} />
           </div>
         ) : slots.length > 0 ? (
@@ -228,8 +228,10 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
                   type="button"
                   className={`slot-btn ${isSlotSelected ? 'selected' : ''}`}
                   onClick={() => handleSlotClick(slot)}
+                  aria-pressed={isSlotSelected}
                 >
-                  {slot.formattedTime}
+                  <Clock size={13} className="slot-btn-icon" />
+                  <span>{slot.formattedTime}</span>
                 </button>
               );
             })}

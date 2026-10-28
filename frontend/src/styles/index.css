@@ -30,6 +30,9 @@
 
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
+
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 *, *::before, *::after {
@@ -46,6 +49,7 @@ html {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -54,6 +58,8 @@ body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
 
 /* Typography Defaults */
@@ -100,14 +106,32 @@ textarea:focus-visible {
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 32px;
+  }
 }
 
 .container-narrow {
   width: 100%;
   max-width: 860px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .container-narrow {
+    padding: 0 24px;
+  }
 }
 
 /* Buttons */
@@ -118,11 +142,19 @@ textarea:focus-visible {
   gap: 8px;
   font-weight: 600;
   font-size: 0.98rem;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.btn-nowrap {
   white-space: nowrap;
 }
 
@@ -242,8 +274,10 @@ textarea:focus-visible {
   border-radius: var(--radius-md);
   background-color: #FFFFFF;
   color: var(--text-primary);
-  font-size: 0.96rem;
+  font-size: 16px; /* 16px prevents iOS Safari auto-zoom */
+  min-height: 44px;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
 }
 
 .form-input:focus,

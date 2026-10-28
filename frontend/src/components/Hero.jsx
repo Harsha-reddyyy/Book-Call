@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2, TrendingUp } from 'lucide-react';
+import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function Hero() {
   const scrollToTopics = (e) => {
@@ -42,7 +42,7 @@ export default function Hero() {
                 </div>
                 <div className="offer-duration-tag">
                   <Clock size={15} />
-                  <span>30–40 Mins 1-on-1 Call</span>
+                  <span>30–40 Mins Call</span>
                 </div>
               </div>
               <p className="offer-hint">
@@ -60,7 +60,7 @@ export default function Hero() {
               <a
                 href="#topics"
                 onClick={scrollToTopics}
-                className="btn btn-secondary btn-lg"
+                className="btn btn-secondary btn-lg hero-secondary-btn"
               >
                 What We Can Discuss
               </a>
@@ -68,20 +68,20 @@ export default function Hero() {
 
             <div className="hero-meta">
               <div className="hero-meta-item">
-                <Clock size={16} />
+                <Clock size={15} />
                 <span>30–40 mins</span>
               </div>
-              <span>·</span>
+              <span className="hero-meta-divider" aria-hidden="true">·</span>
               <div className="hero-meta-item">
-                <User size={16} />
+                <User size={15} />
                 <span>1-on-1 with Harsha</span>
               </div>
-              <span>·</span>
+              <span className="hero-meta-divider" aria-hidden="true">·</span>
               <div className="hero-meta-item">
-                <Video size={16} />
+                <Video size={15} />
                 <span>Google Meet</span>
               </div>
-              <span>·</span>
+              <span className="hero-meta-divider" aria-hidden="true">·</span>
               <div className="hero-meta-item">
                 <span>10 AM – 8 PM IST</span>
               </div>
@@ -100,7 +100,7 @@ export default function Hero() {
                 />
                 <div className="hero-award-badge">
                   <div className="award-badge-icon">
-                    <Award size={20} />
+                    <Award size={18} />
                   </div>
                   <div className="award-badge-text">
                     <strong>148K Subs · 25K+ Insta</strong>

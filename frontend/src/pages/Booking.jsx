@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -9,6 +9,8 @@ import {
   HelpCircle,
   AlertCircle,
   Loader2,
+  CalendarCheck,
+  Sparkles,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -27,6 +29,7 @@ const TOPICS = [
 
 export default function Booking() {
   const navigate = useNavigate();
+  const formCardRef = useRef(null);
 
   // Selected slot state
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -47,6 +50,19 @@ export default function Booking() {
   // Simulated test payment modal state (for dev mode)
   const [mockPaymentModal, setMockPaymentModal] = useState(null);
 
+  const handleSlotSelect = (slot) => {
+    setSelectedSlot(slot);
+    if (errors.slot) {
+      setErrors((prev) => ({ ...prev, slot: null }));
+    }
+    // On small screens, if a slot was just chosen, gently scroll towards details form
+    if (slot && window.innerWidth < 860 && formCardRef.current) {
+      setTimeout(() => {
+        formCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -58,7 +74,7 @@ export default function Booking() {
   const validate = () => {
     const newErrors = {};
     if (!selectedSlot) {
-      newErrors.slot = 'Please choose a date and time slot for your call.';
+      newErrors.slot = 'Please choose an available date and time slot for your call.';
     }
     if (!formData.customerName.trim()) {
       newErrors.customerName = 'Please enter your full name.';
@@ -113,7 +129,7 @@ export default function Booking() {
         setMockPaymentModal({
           bookingId: reservation.bookingId,
           orderId: reservation.orderId,
-          amountDisplay: reservation.amountDisplay || '₹399',
+          amountDisplay: reservation.amountDisplay || '₹299',
         });
         setIsSubmitting(false);
       } else {
@@ -123,7 +139,7 @@ export default function Booking() {
           amount: reservation.amount,
           currency: reservation.currency || 'INR',
           name: 'Harsha Consultation',
-          description: `20-minute 1-on-1 Call (${formData.selectedTopic})`,
+          description: `30–40 min 1-on-1 Call (${formData.selectedTopic})`,
           order_id: reservation.orderId,
           prefill: {
             name: formData.customerName,
@@ -159,7 +175,7 @@ export default function Booking() {
                 setMockPaymentModal({
                   bookingId: reservation.bookingId,
                   orderId: reservation.orderId,
-                  amountDisplay: reservation.amountDisplay || '₹399',
+                  amountDisplay: reservation.amountDisplay || '₹299',
                 });
               } else {
                 setToast({
@@ -217,11 +233,12 @@ export default function Booking() {
   };
 
   return (
-    <div>
+    <div className="booking-page-wrap">
       <Navbar />
 
       <main className="booking-page">
         <div className="container">
+          {/* Header */}
           <div className="booking-header">
             <Link to="/" className="booking-header-back">
               <ArrowLeft size={16} />
@@ -232,50 +249,58 @@ export default function Booking() {
 
             <div className="booking-meta-bar">
               <div className="booking-meta-item">
-                <Clock size={16} />
+                <Clock size={15} />
                 <span>Duration: <strong>30–40 mins</strong></span>
               </div>
-              <span className="booking-meta-dot">·</span>
+              <span className="booking-meta-dot" aria-hidden="true">·</span>
               <div className="booking-meta-item">
-                <Video size={16} />
+                <Video size={15} />
                 <span>Format: <strong>Google Meet</strong></span>
               </div>
-              <span className="booking-meta-dot">·</span>
+              <span className="booking-meta-dot" aria-hidden="true">·</span>
               <div className="booking-meta-item">
                 <span>Fee: <strong style={{ color: 'var(--accent)' }}>₹299 INR</strong> <s style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginLeft: '4px' }}>₹499</s></span>
               </div>
-              <span className="booking-meta-dot">·</span>
+              <span className="booking-meta-dot" aria-hidden="true">·</span>
               <div className="booking-meta-item">
                 <span>Hours: <strong>10:00 AM – 8:00 PM IST</strong></span>
               </div>
             </div>
           </div>
 
+          {/* Responsive 2-Step Layout */}
           <div className="booking-layout">
-            {/* Left Column: Calendar & Time Slots */}
-            <div className="booking-card">
-              <h2 className="booking-card-title">1. Select Date & Time</h2>
+            {/* Step 1: Calendar & Time Slots */}
+            <div className="booking-card booking-card-calendar">
+              <div className="booking-step-badge">
+                <span className="step-num">Step 1</span>
+                <span>Choose Date & Time</span>
+              </div>
+              <h2 className="booking-card-title">Select Date & Time</h2>
               <p className="booking-card-subtitle">
-                Pick an available slot. All appointment times are shown in Indian
-                Standard Time (IST).
+                Pick an available slot. All appointment times are in Indian Standard Time (IST).
               </p>
 
               <CalendarPicker
-                onSlotSelect={setSelectedSlot}
+                onSlotSelect={handleSlotSelect}
                 selectedSlot={selectedSlot}
               />
 
               {errors.slot && (
-                <div className="form-error" style={{ marginTop: '14px' }}>
-                  <AlertCircle size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                  {errors.slot}
+                <div className="form-error booking-slot-error">
+                  <AlertCircle size={15} />
+                  <span>{errors.slot}</span>
                 </div>
               )}
             </div>
 
-            {/* Right Column: Customer Details & Payment */}
-            <div className="booking-card">
-              <h2 className="booking-card-title">2. Tell Me What You Need</h2>
+            {/* Step 2: Customer Details & Payment */}
+            <div className="booking-card booking-card-form" ref={formCardRef}>
+              <div className="booking-step-badge">
+                <span className="step-num">Step 2</span>
+                <span>Your Details & Payment</span>
+              </div>
+              <h2 className="booking-card-title">Tell Me What You Need</h2>
               <p className="booking-card-subtitle">
                 Help me prepare so we can dive straight into your questions.
               </p>
@@ -283,37 +308,31 @@ export default function Booking() {
               {/* Slot Summary */}
               {selectedSlot ? (
                 <div className="booking-summary-banner">
+                  <div className="summary-header">
+                    <CalendarCheck size={18} className="summary-icon" />
+                    <span className="summary-title">Selected Appointment</span>
+                  </div>
                   <div className="summary-row">
                     <span className="summary-label">Date</span>
                     <span className="summary-val">{selectedSlot.date}</span>
                   </div>
                   <div className="summary-row">
                     <span className="summary-label">Time</span>
-                    <span className="summary-val">{selectedSlot.formattedRange} (IST)</span>
+                    <span className="summary-val">{selectedSlot.formattedRange || selectedSlot.formattedTime} (IST)</span>
                   </div>
                   <div className="summary-row">
                     <span className="summary-label">Duration</span>
-                    <span className="summary-val">20 minutes</span>
+                    <span className="summary-val">30–40 minutes</span>
                   </div>
                   <div className="summary-row total">
                     <span className="summary-label">Total Due</span>
-                    <span className="summary-val">₹399.00</span>
+                    <span className="summary-val">₹299.00</span>
                   </div>
                 </div>
               ) : (
-                <div
-                  style={{
-                    backgroundColor: 'var(--surface-subtle)',
-                    border: '1px dashed var(--border-color)',
-                    padding: '16px',
-                    borderRadius: 'var(--radius-md)',
-                    marginBottom: '24px',
-                    fontSize: '0.9rem',
-                    color: 'var(--text-muted)',
-                    textAlign: 'center',
-                  }}
-                >
-                  Select an available date & time on the left to proceed with booking.
+                <div className="booking-summary-placeholder">
+                  <Clock size={18} style={{ margin: '0 auto 6px', color: 'var(--accent)' }} />
+                  <div>Select an available date & time above to proceed.</div>
                 </div>
               )}
 
@@ -393,7 +412,7 @@ export default function Booking() {
                     rows={4}
                     value={formData.customerQuestions}
                     onChange={handleInputChange}
-                    placeholder="Briefly describe what you're working on, what questions you have, or any specific links you want me to look at..."
+                    placeholder="Briefly describe what you're working on, questions you have, or any specific links you want me to look at..."
                     className={`form-textarea ${errors.customerQuestions ? 'error' : ''}`}
                     disabled={isSubmitting}
                   />
@@ -403,68 +422,45 @@ export default function Booking() {
                 </div>
 
                 {/* Early Bird Price Callout Box */}
-                <div
-                  style={{
-                    backgroundColor: 'rgba(244, 119, 33, 0.08)',
-                    border: '1px solid var(--accent-border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '12px 16px',
-                    marginBottom: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
+                <div className="booking-price-callout">
                   <div>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+                    <span className="price-callout-badge">
                       ⚡ Early Bird Offer
                     </span>
-                    <div style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
+                    <div className="price-callout-sub">
                       30–40 min 1-on-1 session
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>₹299</span>
-                    <s style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '6px' }}>₹499</s>
+                    <span className="price-callout-amount">₹299</span>
+                    <s className="price-callout-original">₹499</s>
                   </div>
                 </div>
 
                 {/* Submit / Pay Button */}
                 <button
                   type="submit"
-                  className="btn btn-primary"
-                  style={{ width: '100%', padding: '14px', fontSize: '1.05rem' }}
+                  className="btn btn-primary booking-submit-btn"
                   disabled={isSubmitting || !selectedSlot}
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      <span>Processing...</span>
+                      <span>Processing Reservation...</span>
                     </>
                   ) : (
                     <span>Book a Call — ₹299</span>
                   )}
                 </button>
 
-                {/* 1-Click Sandbox Test Option */}
+                {/* 1-Click Sandbox Test Option (responsive wrapping) */}
                 <button
                   type="button"
                   onClick={(e) => handleBookingSubmit(e, true)}
-                  className="btn"
-                  style={{
-                    width: '100%',
-                    marginTop: '10px',
-                    padding: '12px',
-                    fontSize: '0.92rem',
-                    backgroundColor: 'rgba(244, 119, 33, 0.08)',
-                    color: 'var(--accent)',
-                    border: '1px dashed var(--accent)',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 600,
-                  }}
+                  className="btn booking-test-mode-btn"
                   disabled={isSubmitting || !selectedSlot}
                 >
-                  ⚡ Test Mode: 1-Click Instant Complete (Skip Popup)
+                  <span>⚡ Test Mode: 1-Click Instant Complete (Skip Popup)</span>
                 </button>
               </form>
 
@@ -496,36 +492,28 @@ export default function Booking() {
       {/* Simulated Dev Payment Modal */}
       {mockPaymentModal && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '460px' }}>
+          <div className="modal-content modal-content-sm">
             <div className="modal-header">
               <h3 className="modal-title">Simulated Payment Checkout</h3>
             </div>
-            <p style={{ marginBottom: '16px', fontSize: '0.94rem' }}>
+            <p style={{ marginBottom: '16px', fontSize: '0.94rem', color: 'var(--text-secondary)' }}>
               Razorpay is currently in safe development test mode. In production with live keys, this opens the official Razorpay Checkout popup.
             </p>
-            <div
-              style={{
-                backgroundColor: 'var(--surface-subtle)',
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                marginBottom: '24px',
-                border: '1px solid var(--border-color)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div className="modal-payment-summary">
+              <div className="payment-summary-row">
                 <span>Booking ID:</span>
                 <strong>{mockPaymentModal.bookingId}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div className="payment-summary-row">
                 <span>Amount:</span>
                 <strong>{mockPaymentModal.amountDisplay}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className="payment-summary-row">
                 <span>Status:</span>
                 <span className="badge badge-accent">Ready for Payment</span>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="modal-actions-row">
               <button
                 type="button"
                 className="btn btn-primary"
@@ -533,7 +521,7 @@ export default function Booking() {
                 onClick={completeSimulatedPayment}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Verifying...' : 'Complete Test Payment (₹399)'}
+                {isSubmitting ? 'Verifying...' : 'Complete Test Payment (₹299)'}
               </button>
               <button
                 type="button"

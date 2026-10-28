@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Clock, Calendar, CheckCircle2, TrendingUp, Users } from 'lucide-react';
+import { Award, Clock, Calendar, TrendingUp } from 'lucide-react';
 
 export default function About() {
   return (
@@ -34,21 +34,27 @@ export default function About() {
 
             <div className="about-highlights-grid">
               <div className="about-highlight-item">
-                <TrendingUp size={18} className="highlight-icon" />
+                <div className="highlight-icon-wrap">
+                  <TrendingUp size={18} className="highlight-icon" />
+                </div>
                 <div>
                   <strong>148K+ YT · 25K+ Insta</strong>
                   <span>Started on Dec 28, 2025</span>
                 </div>
               </div>
               <div className="about-highlight-item">
-                <Clock size={18} className="highlight-icon" />
+                <div className="highlight-icon-wrap">
+                  <Clock size={18} className="highlight-icon" />
+                </div>
                 <div>
                   <strong>10:00 AM – 8:00 PM IST</strong>
                   <span>Available Mon–Sat</span>
                 </div>
               </div>
               <div className="about-highlight-item">
-                <Calendar size={18} className="highlight-icon" />
+                <div className="highlight-icon-wrap">
+                  <Calendar size={18} className="highlight-icon" />
+                </div>
                 <div>
                   <strong>30–40 Mins Call</strong>
                   <span>Early Bird: ₹299 (Reg. ₹499)</span>

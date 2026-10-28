@@ -1,23 +1,35 @@
 /* ==========================================================================
-   BOOKING PAGE & CONFIRMATION STYLES
+   BOOKING PAGE & CONFIRMATION STYLES - PRODUCTION QUALITY RESPONSIVE DESIGN
    ========================================================================== */
 
-.booking-page {
-  padding: 48px 0 80px;
+.booking-page-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+.booking-page {
+  flex: 1;
+  padding: 40px 0 72px;
+}
+
+/* --------------------------------------------------------------------------
+   Booking Header
+   -------------------------------------------------------------------------- */
 .booking-header {
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .booking-header-back {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.92rem;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  padding: 4px 0;
+  transition: color var(--transition-fast);
 }
 
 .booking-header-back:hover {
@@ -25,17 +37,17 @@
 }
 
 .booking-header-title {
-  font-size: 2.2rem;
+  font-size: clamp(1.75rem, 4vw, 2.3rem);
   letter-spacing: -0.025em;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .booking-meta-bar {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   color: var(--text-secondary);
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -44,9 +56,10 @@
 }
 
 .booking-meta-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .booking-meta-item strong {
@@ -55,9 +68,12 @@
 
 .booking-meta-dot {
   color: var(--border-color);
+  font-weight: bold;
 }
 
-/* Two-column layout */
+/* --------------------------------------------------------------------------
+   Booking Layout Grid (Two-column desktop / Tablet, stacked mobile)
+   -------------------------------------------------------------------------- */
 .booking-layout {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
@@ -70,6 +86,32 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 28px;
+  min-width: 0; /* CRITICAL: prevents CSS grid blowout */
+  box-sizing: border-box;
+  box-shadow: var(--shadow-subtle);
+}
+
+.booking-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.booking-step-badge .step-num {
+  background-color: var(--accent);
+  color: #FFFFFF;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .booking-card-title {
@@ -79,72 +121,113 @@
 }
 
 .booking-card-subtitle {
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   color: var(--text-secondary);
-  margin-bottom: 24px;
+  margin-bottom: 22px;
+  line-height: 1.5;
 }
 
-/* Calendar Component */
+.booking-slot-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Calendar Component
+   -------------------------------------------------------------------------- */
 .calendar-wrap {
-  margin-bottom: 28px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin-bottom: 24px;
 }
 
 .calendar-month-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .calendar-month-title {
   font-size: 1.08rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
+.calendar-nav-controls {
+  display: flex;
+  gap: 6px;
+}
+
 .calendar-nav-btn {
-  background: none;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-primary);
-  transition: background-color var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .calendar-nav-btn:hover:not(:disabled) {
   background-color: var(--surface-subtle);
+  border-color: #D6D2C9;
 }
 
 .calendar-nav-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
+/* Calendar Day Grid */
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .calendar-day-header {
-  font-size: 0.82rem;
+  font-size: 0.80rem;
   font-weight: 600;
   color: var(--text-muted);
-  padding-bottom: 10px;
+  padding-bottom: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.cal-day-full {
+  display: inline;
+}
+
+.cal-day-mini {
+  display: none;
+}
+
+.calendar-day-empty {
+  aspect-ratio: 1;
+  min-width: 0;
 }
 
 .calendar-day-btn {
   aspect-ratio: 1;
+  min-width: 0;
+  width: 100%;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: none;
-  font-size: 0.94rem;
+  font-size: clamp(0.82rem, 2.5vw, 0.94rem);
   font-weight: 500;
   color: var(--text-primary);
   display: flex;
@@ -154,6 +237,9 @@
   cursor: pointer;
   position: relative;
   transition: all var(--transition-fast);
+  touch-action: manipulation;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .calendar-day-btn.has-slots {
@@ -166,15 +252,20 @@
   background-color: var(--accent-light);
 }
 
+.calendar-day-btn.has-slots:active {
+  transform: scale(0.96);
+}
+
 .calendar-day-btn.selected {
   background-color: var(--accent) !important;
   color: #FFFFFF !important;
   font-weight: 700;
   border-color: var(--accent) !important;
+  box-shadow: 0 2px 8px rgba(244, 119, 33, 0.35);
 }
 
 .calendar-day-btn:disabled {
-  color: #C0BEB9;
+  color: #C8C6C1;
   background-color: transparent !important;
   cursor: not-allowed;
 }
@@ -185,56 +276,78 @@
   border-radius: 50%;
   background-color: var(--accent);
   position: absolute;
-  bottom: 4px;
+  bottom: 3px;
 }
 
 .calendar-day-btn.selected .calendar-today-indicator {
   background-color: #FFFFFF;
 }
 
-/* Slots Section */
+/* --------------------------------------------------------------------------
+   Slots Section
+   -------------------------------------------------------------------------- */
 .slots-section {
-  padding-top: 20px;
+  padding-top: 18px;
   border-top: 1px solid var(--border-color);
+  min-width: 0;
 }
 
 .slots-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .slots-header-title {
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .slots-timezone {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-  gap: 10px;
-  max-height: 250px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  max-height: 260px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-right: 4px;
+  min-width: 0;
 }
 
 .slot-btn {
-  padding: 10px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 8px 6px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background-color: var(--card-bg);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
   transition: all var(--transition-fast);
+  touch-action: manipulation;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.slot-btn-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .slot-btn:hover {
@@ -247,31 +360,57 @@
   background-color: var(--accent);
   color: #FFFFFF;
   border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(244, 119, 33, 0.35);
+}
+
+.slot-btn.selected .slot-btn-icon {
+  color: #FFFFFF;
 }
 
 .slots-empty {
-  padding: 24px;
+  padding: 22px 16px;
   text-align: center;
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   color: var(--text-secondary);
   background-color: var(--surface-subtle);
   border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
 }
 
-/* Selection Summary Card in Form Column */
+/* --------------------------------------------------------------------------
+   Booking Summary & Details Form
+   -------------------------------------------------------------------------- */
 .booking-summary-banner {
   background-color: var(--surface-subtle);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--accent-border);
   border-radius: var(--radius-md);
   padding: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-icon {
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.92rem;
-  padding: 5px 0;
+  align-items: center;
+  font-size: 0.90rem;
+  padding: 4px 0;
 }
 
 .summary-row.total {
@@ -290,6 +429,81 @@
 .summary-val {
   font-weight: 600;
   color: var(--text-primary);
+  text-align: right;
+}
+
+.booking-summary-placeholder {
+  background-color: var(--surface-subtle);
+  border: 1px dashed var(--border-color);
+  padding: 18px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 22px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Price Callout */
+.booking-price-callout {
+  background-color: rgba(244, 119, 33, 0.08);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.price-callout-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.price-callout-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.price-callout-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.price-callout-original {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.booking-submit-btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 14px;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 14px rgba(244, 119, 33, 0.28);
+}
+
+.booking-test-mode-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  background-color: rgba(244, 119, 33, 0.08);
+  color: var(--accent);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.35;
 }
 
 /* Trust Badges below form */
@@ -297,27 +511,31 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 22px;
+  padding-top: 18px;
   border-top: 1px solid var(--border-color);
 }
 
 .trust-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.84rem;
   color: var(--text-secondary);
+  line-height: 1.45;
 }
 
 .trust-icon {
   color: var(--accent);
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
-/* Confirmation Page */
+/* --------------------------------------------------------------------------
+   Confirmation Page
+   -------------------------------------------------------------------------- */
 .confirmation-page {
-  padding: 60px 0 90px;
+  padding: 48px 0 80px;
 }
 
 .confirmation-card {
@@ -325,77 +543,58 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 44px;
+  box-shadow: var(--shadow-subtle);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .confirmation-status-icon {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background-color: var(--success-bg);
   color: var(--success);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .confirmation-title {
-  font-size: 2.2rem;
+  font-size: clamp(1.85rem, 4.5vw, 2.35rem);
   letter-spacing: -0.025em;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .confirmation-subtitle {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin-bottom: 32px;
-}
-
-.confirmation-details-box {
-  background-color: var(--surface-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 24px;
-  margin-bottom: 32px;
-}
-
-.confirmation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px 24px;
-}
-
-.confirmation-detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.conf-label {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.conf-value {
   font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  line-height: 1.6;
 }
 
+/* Google Meet Ready Banner */
 .conf-meet-banner {
-  background-color: #FFF7F0;
-  border: 1px solid var(--accent-border);
+  background: linear-gradient(135deg, #FFF7F0, #FFFFFF);
+  border: 1.5px solid var(--accent-border);
   border-radius: var(--radius-md);
-  padding: 24px;
-  margin-bottom: 32px;
+  padding: 22px 24px;
+  margin-bottom: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 18px;
   flex-wrap: wrap;
+}
+
+.conf-meet-banner.pending {
+  background: var(--surface-subtle);
+  border-color: var(--border-color);
+}
+
+.meet-info-text {
+  flex: 1;
+  min-width: 240px;
 }
 
 .meet-info-title {
@@ -406,106 +605,265 @@
 }
 
 .meet-info-desc {
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   color: #723408;
 }
 
+.conf-meet-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.conf-btn-join {
+  box-shadow: 0 4px 12px rgba(244, 119, 33, 0.28);
+}
+
+.copy-btn-label {
+  display: inline;
+}
+
+/* Details Box */
+.confirmation-details-box {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+
+.confirmation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.confirmation-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.conf-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.conf-value {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.conf-value-mono {
+  font-family: var(--font-mono);
+  font-size: 0.94rem;
+}
+
 .conf-questions-box {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .conf-questions-content {
   background-color: var(--surface-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
-  font-size: 0.95rem;
+  padding: 16px 18px;
+  font-size: 0.94rem;
   color: var(--text-primary);
   white-space: pre-wrap;
   line-height: 1.6;
 }
 
+.conf-tips-box {
+  margin-bottom: 28px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background-color: #FAF8F5;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+
+.conf-tips-list {
+  padding-left: 20px;
+  margin-top: 6px;
+}
+
+.conf-tips-list li {
+  margin-bottom: 6px;
+}
+
 .conf-actions {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
-/* Responsiveness */
-@media (max-width: 1024px) {
-  .booking-layout {
-    gap: 24px;
-  }
+/* --------------------------------------------------------------------------
+   Modal Elements for Booking
+   -------------------------------------------------------------------------- */
+.modal-content-sm {
+  max-width: 460px;
 }
 
-@media (max-width: 860px) {
+.modal-payment-summary {
+  background-color: var(--surface-subtle);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 22px;
+  border: 1px solid var(--border-color);
+}
+
+.payment-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+}
+
+.payment-summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.modal-actions-row .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS: BOOKING & CONFIRMATION
+   ========================================================================== */
+
+/* Tablet (max-width: 959px) */
+@media (max-width: 959px) {
   .booking-page {
     padding: 32px 0 60px;
   }
   .booking-layout {
     grid-template-columns: 1fr;
-  }
-  .confirmation-grid {
-    grid-template-columns: 1fr;
+    gap: 24px;
   }
   .confirmation-card {
-    padding: 30px 20px;
+    padding: 32px 24px;
   }
 }
 
+/* Mobile Devices (max-width: 640px) */
 @media (max-width: 640px) {
   .booking-page {
     padding: 20px 0 48px;
   }
   .booking-header {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .booking-header-title {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     line-height: 1.25;
   }
+
   .booking-meta-bar {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 10px 14px;
     padding: 12px 14px;
+  }
+  .booking-meta-item {
+    font-size: 0.82rem;
+    white-space: normal;
   }
   .booking-meta-dot {
     display: none;
   }
+
   .booking-card {
-    padding: 20px 16px;
+    padding: 18px 16px;
     border-radius: var(--radius-md);
   }
-  .calendar-day-btn {
-    font-size: 0.88rem;
-    min-height: 38px;
+
+  /* Compact Calendar for small screens */
+  .cal-day-full {
+    display: none;
   }
+  .cal-day-mini {
+    display: inline;
+  }
+  .calendar-day-header {
+    font-size: 0.76rem;
+    padding-bottom: 6px;
+  }
+  .calendar-grid {
+    gap: 3px;
+  }
+  .calendar-day-btn {
+    font-size: 0.85rem;
+    border-radius: 3px;
+  }
+
+  /* Slot Buttons: 3 cols on 375px+, 2 cols on smaller */
   .slots-grid {
-    grid-template-columns: repeat(2, 1fr);
-    max-height: 300px;
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 6px;
+    max-height: 240px;
   }
   .slot-btn {
-    padding: 12px 6px;
-    font-size: 0.92rem;
-    min-height: 44px;
+    padding: 10px 4px;
+    font-size: 0.82rem;
+    min-height: 42px;
   }
-  .form-input,
-  .form-select,
-  .form-textarea {
-    font-size: 16px !important; /* Prevents auto-zoom on iOS */
-    padding: 12px 14px;
+
+  /* Confirmation Page Mobile */
+  .confirmation-page {
+    padding: 24px 0 54px;
+  }
+  .confirmation-card {
+    padding: 22px 16px;
+    border-radius: var(--radius-md);
+  }
+  .confirmation-title {
+    font-size: 1.65rem;
+  }
+  .confirmation-subtitle {
+    font-size: 0.98rem;
+    margin-bottom: 22px;
   }
   .conf-meet-banner {
-    padding: 18px 16px;
+    padding: 16px;
     flex-direction: column;
     align-items: stretch;
-    text-align: left;
+    gap: 14px;
   }
-  .conf-meet-banner .btn {
+  .conf-meet-actions {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+  .conf-meet-actions .btn {
     width: 100%;
     justify-content: center;
+    padding: 12px 14px;
+  }
+  .confirmation-details-box {
+    padding: 16px;
+    margin-bottom: 22px;
+  }
+  .confirmation-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
   .conf-actions {
     flex-direction: column;
@@ -513,5 +871,19 @@
   .conf-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Extra Small Mobile (max-width: 360px) */
+@media (max-width: 360px) {
+  .booking-meta-bar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .price-callout-amount {
+    font-size: 1.15rem;
   }
 }

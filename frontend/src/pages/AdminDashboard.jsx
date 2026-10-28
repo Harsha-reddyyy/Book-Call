@@ -285,12 +285,29 @@ export default function AdminDashboard() {
     <div className="admin-layout">
       {/* Admin Top Header */}
       <header className="admin-header">
-        <div className="admin-brand">
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>Harsha</span>
-            <span className="brand-dot" />
-          </Link>
-          <span className="admin-badge">Admin Portal</span>
+        <div className="admin-header-row">
+          <div className="admin-brand">
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>Harsha</span>
+              <span className="brand-dot" />
+            </Link>
+            <span className="admin-badge">Admin Portal</span>
+          </div>
+
+          {/* User Actions */}
+          <div className="admin-user-actions">
+            <span className="admin-user-name">
+              <strong>{adminUser?.username || 'Admin'}</strong>
+            </span>
+            <button
+              onClick={handleLogout}
+              className="btn btn-secondary btn-sm admin-sign-out-btn"
+              title="Sign Out"
+            >
+              <LogOut size={14} />
+              <span className="sign-out-btn-text">Sign Out</span>
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -317,21 +334,6 @@ export default function AdminDashboard() {
           >
             <FileText size={16} />
             <span>Policy Editor</span>
-          </button>
-        </div>
-
-        {/* User Actions */}
-        <div className="admin-user-actions">
-          <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-            Signed in as <strong>{adminUser?.username || 'Admin'}</strong>
-          </span>
-          <button
-            onClick={handleLogout}
-            className="btn btn-secondary btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <LogOut size={14} />
-            <span>Sign Out</span>
           </button>
         </div>
       </header>
@@ -395,7 +397,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Bookings Table */}
+            {/* Bookings View: Desktop Table & Mobile Cards */}
             <div className="table-container">
               {loadingBookings ? (
                 <div style={{ padding: '60px 0', textAlign: 'center' }}>
@@ -407,20 +409,96 @@ export default function AdminDashboard() {
                   No bookings found matching your current filter.
                 </div>
               ) : (
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Booking ID</th>
-                      <th>Customer</th>
-                      <th>Topic</th>
-                      <th>Date & Time (IST)</th>
-                      <th>Payment</th>
-                      <th>Status</th>
-                      <th>Meet Link</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <>
+                  {/* Desktop Table (Visible >= 768px) */}
+                  <div className="admin-desktop-table-wrap">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Booking ID</th>
+                          <th>Customer</th>
+                          <th>Topic</th>
+                          <th>Date & Time (IST)</th>
+                          <th>Payment</th>
+                          <th>Status</th>
+                          <th>Meet Link</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bookings.map((b) => {
+                          const startDate = new Date(b.startTime);
+                          const dateStr = startDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            timeZone: 'Asia/Kolkata',
+                          });
+                          const timeStr = startDate.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            timeZone: 'Asia/Kolkata',
+                          });
+
+                          return (
+                            <tr key={b._id}>
+                              <td>
+                                <span className="table-booking-id">{b.bookingId}</span>
+                              </td>
+                              <td>
+                                <div className="table-cust-name">{b.customerName}</div>
+                                <div className="table-cust-email">{b.customerEmail}</div>
+                              </td>
+                              <td>{b.selectedTopic}</td>
+                              <td>
+                                <div>{dateStr}</div>
+                                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                                  {timeStr}
+                                </div>
+                              </td>
+                              <td>
+                                <span className={`status-pill status-${b.paymentStatus}`}>
+                                  {b.paymentStatus}
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`status-pill status-${b.bookingStatus}`}>
+                                  {b.bookingStatus}
+                                </span>
+                              </td>
+                              <td>
+                                {b.googleMeetUrl ? (
+                                  <a
+                                    href={b.googleMeetUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    <span>Join</span>
+                                    <ExternalLink size={12} />
+                                  </a>
+                                ) : (
+                                  <span style={{ color: 'var(--text-muted)' }}>—</span>
+                                )}
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary btn-sm"
+                                  onClick={() => setSelectedBooking(b)}
+                                >
+                                  Details
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Booking Cards (Visible < 768px) */}
+                  <div className="admin-mobile-cards-wrap">
                     {bookings.map((b) => {
                       const startDate = new Date(b.startTime);
                       const dateStr = startDate.toLocaleDateString('en-US', {
@@ -436,60 +514,63 @@ export default function AdminDashboard() {
                       });
 
                       return (
-                        <tr key={b._id}>
-                          <td>
+                        <div key={b._id} className="admin-booking-card">
+                          <div className="admin-card-header">
                             <span className="table-booking-id">{b.bookingId}</span>
-                          </td>
-                          <td>
-                            <div className="table-cust-name">{b.customerName}</div>
-                            <div className="table-cust-email">{b.customerEmail}</div>
-                          </td>
-                          <td>{b.selectedTopic}</td>
-                          <td>
-                            <div>{dateStr}</div>
-                            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                              {timeStr}
+                            <div className="admin-card-status-group">
+                              <span className={`status-pill status-${b.paymentStatus}`}>
+                                {b.paymentStatus}
+                              </span>
+                              <span className={`status-pill status-${b.bookingStatus}`}>
+                                {b.bookingStatus}
+                              </span>
                             </div>
-                          </td>
-                          <td>
-                            <span className={`status-pill status-${b.paymentStatus}`}>
-                              {b.paymentStatus}
-                            </span>
-                          </td>
-                          <td>
-                            <span className={`status-pill status-${b.bookingStatus}`}>
-                              {b.bookingStatus}
-                            </span>
-                          </td>
-                          <td>
-                            {b.googleMeetUrl ? (
+                          </div>
+
+                          <div className="admin-card-body">
+                            <div className="admin-card-cust">
+                              <strong>{b.customerName}</strong>
+                              <span className="admin-card-email">{b.customerEmail}</span>
+                            </div>
+
+                            <div className="admin-card-meta-row">
+                              <div className="admin-card-meta-item">
+                                <span className="meta-tag">{b.selectedTopic}</span>
+                              </div>
+                              <div className="admin-card-meta-item">
+                                <Clock size={13} style={{ color: 'var(--accent)' }} />
+                                <span>{dateStr} · {timeStr} IST</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="admin-card-actions">
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm"
+                              style={{ flex: 1 }}
+                              onClick={() => setSelectedBooking(b)}
+                            >
+                              View Details
+                            </button>
+                            {b.googleMeetUrl && (
                               <a
                                 href={b.googleMeetUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                className="btn btn-primary btn-sm"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                               >
-                                <span>Join</span>
-                                <ExternalLink size={12} />
+                                <span>Join Meet</span>
+                                <ExternalLink size={13} />
                               </a>
-                            ) : (
-                              <span style={{ color: 'var(--text-muted)' }}>—</span>
                             )}
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => setSelectedBooking(b)}
-                            >
-                              Details
-                            </button>
-                          </td>
-                        </tr>
+                          </div>
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -816,14 +897,14 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div className="admin-modal-grid">
               <div>
                 <span className="conf-label">Customer Name</span>
                 <div style={{ fontWeight: 600 }}>{selectedBooking.customerName}</div>
               </div>
               <div>
                 <span className="conf-label">Customer Email</span>
-                <div style={{ fontWeight: 600 }}>{selectedBooking.customerEmail}</div>
+                <div style={{ fontWeight: 600, wordBreak: 'break-all' }}>{selectedBooking.customerEmail}</div>
               </div>
               <div>
                 <span className="conf-label">Topic</span>
@@ -841,7 +922,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <span className="conf-label">Razorpay Order ID</span>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', wordBreak: 'break-all' }}>
                   {selectedBooking.razorpayOrderId || '—'}
                 </div>
               </div>

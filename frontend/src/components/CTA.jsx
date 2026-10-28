@@ -19,8 +19,8 @@ export default function CTA() {
             <ArrowRight size={18} />
           </Link>
 
-          <div className="hero-meta-item cta-subtext">
-            <Clock size={15} />
+          <div className="cta-subtext">
+            <Clock size={15} style={{ flexShrink: 0 }} />
             <span>30–40 minute dedicated 1-on-1 session on Google Meet · 10 AM – 8 PM IST</span>
           </div>
         </div>
