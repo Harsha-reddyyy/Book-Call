@@ -76,9 +76,10 @@ app.get('/api/health', (req, res) => {
       secretLength: rzpSec ? rzpSec.length : 0,
     },
     email: {
-      configured: Boolean(resendKey && !resendKey.includes('placeholder')),
+      provider: process.env.GMAIL_USER ? 'gmail_smtp' : resendKey ? 'resend' : 'mock',
+      configured: Boolean((process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) || (resendKey && !resendKey.includes('placeholder'))),
+      gmailUser: process.env.GMAIL_USER ? `${process.env.GMAIL_USER.substring(0, 5)}...` : undefined,
       from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
-      keyPrefix: resendKey ? `${resendKey.substring(0, 6)}...` : 'missing',
     },
   });
 });

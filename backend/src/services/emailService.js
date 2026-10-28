@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { format as formatZoned } from 'date-fns-tz';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -6,6 +7,17 @@ dotenv.config();
 const sanitizeEnv = (val) => val?.trim().replace(/^['"]|['"]$/g, '');
 const resendApiKey = sanitizeEnv(process.env.RESEND_API_KEY);
 const emailFrom = sanitizeEnv(process.env.EMAIL_FROM) || 'Harsha Consultations <onboarding@resend.dev>';
+const gmailUser = sanitizeEnv(process.env.GMAIL_USER);
+const gmailAppPassword = sanitizeEnv(process.env.GMAIL_APP_PASSWORD)?.replace(/\s+/g, '');
+
+export const isGmailConfigured = () => {
+  return Boolean(
+    gmailUser &&
+    gmailAppPassword &&
+    !gmailAppPassword.includes('YOUR_') &&
+    !gmailAppPassword.includes('placeholder')
+  );
+};
 
 export const isResendConfigured = () => {
   return Boolean(
@@ -16,6 +28,18 @@ export const isResendConfigured = () => {
 };
 
 const resend = isResendConfigured() ? new Resend(resendApiKey) : null;
+
+let gmailTransporter = null;
+if (isGmailConfigured()) {
+  gmailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: gmailUser,
+      pass: gmailAppPassword,
+    },
+  });
+  console.log('[Email] Gmail SMTP Transporter initialized for:', gmailUser);
+}
 
 /**
  * Format confirmation email HTML template
@@ -189,6 +213,26 @@ export async function sendBookingConfirmation(booking) {
   const subject = `Confirmed: Consultation with Harsha — ${booking.bookingId}`;
   const html = buildConfirmationHtml(booking);
 
+  // 1. Prioritize Gmail SMTP if configured (sends to ANY customer email)
+  if (isGmailConfigured() && gmailTransporter) {
+    try {
+      const fromHeader = `"Harsha Consultations" <${gmailUser}>`;
+      const info = await gmailTransporter.sendMail({
+        from: fromHeader,
+        to: booking.customerEmail,
+        subject,
+        html,
+      });
+
+      console.log(`[Email] Gmail confirmation sent to ${booking.customerEmail} (ID: ${info.messageId})`);
+      return { success: true, emailId: info.messageId, error: null };
+    } catch (err) {
+      console.error('[Gmail Error] Failed to send email:', err.message);
+      // Fall through to Resend if available
+    }
+  }
+
+  // 2. Resend API
   if (isResendConfigured() && resend) {
     try {
       const response = await resend.emails.send({

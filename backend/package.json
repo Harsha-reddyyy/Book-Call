@@ -21,6 +21,7 @@
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
+    "nodemailer": "^10.2.1",
     "razorpay": "^2.9.5",
     "resend": "^4.1.1"
   },
