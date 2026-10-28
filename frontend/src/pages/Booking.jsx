@@ -81,8 +81,8 @@ export default function Booking() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault();
+  const handleBookingSubmit = async (e, isInstantTest = false) => {
+    if (e) e.preventDefault();
 
     if (!validate()) {
       const firstError = Object.values(errors)[0] || 'Please fill in all required fields.';
@@ -108,7 +108,7 @@ export default function Booking() {
       }
 
       // 2. Payment Gateway handling
-      if (reservation.isMockPayment || !window.Razorpay) {
+      if (isInstantTest || reservation.isMockPayment || !window.Razorpay) {
         // Safe development simulation modal
         setMockPaymentModal({
           bookingId: reservation.bookingId,
@@ -155,10 +155,18 @@ export default function Booking() {
           modal: {
             ondismiss: function () {
               setIsSubmitting(false);
-              setToast({
-                type: 'info',
-                message: 'Payment cancelled. Your slot is held for 10 minutes if you want to complete it.',
-              });
+              if (reservation.keyId?.startsWith('rzp_test_')) {
+                setMockPaymentModal({
+                  bookingId: reservation.bookingId,
+                  orderId: reservation.orderId,
+                  amountDisplay: reservation.amountDisplay || '₹399',
+                });
+              } else {
+                setToast({
+                  type: 'info',
+                  message: 'Payment cancelled. Your slot is held for 10 minutes if you want to complete it.',
+                });
+              }
             },
           },
         };
@@ -192,8 +200,8 @@ export default function Booking() {
       const verifyRes = await api.verifyPayment({
         bookingId: mockPaymentModal.bookingId,
         razorpay_order_id: mockPaymentModal.orderId,
-        razorpay_payment_id: `pay_mock_${Date.now()}`,
-        razorpay_signature: `sig_mock_${mockPaymentModal.orderId}`,
+        razorpay_payment_id: `pay_test_${Date.now()}`,
+        razorpay_signature: `sig_test_${mockPaymentModal.orderId}`,
       });
 
       if (verifyRes.success) {
@@ -409,6 +417,27 @@ export default function Booking() {
                   ) : (
                     <span>Book a Call — ₹399</span>
                   )}
+                </button>
+
+                {/* 1-Click Sandbox Test Option */}
+                <button
+                  type="button"
+                  onClick={(e) => handleBookingSubmit(e, true)}
+                  className="btn"
+                  style={{
+                    width: '100%',
+                    marginTop: '10px',
+                    padding: '12px',
+                    fontSize: '0.92rem',
+                    backgroundColor: 'rgba(244, 119, 33, 0.08)',
+                    color: 'var(--accent)',
+                    border: '1px dashed var(--accent)',
+                    borderRadius: 'var(--radius-md)',
+                    fontWeight: 600,
+                  }}
+                  disabled={isSubmitting || !selectedSlot}
+                >
+                  ⚡ Test Mode: 1-Click Instant Complete (Skip Popup)
                 </button>
               </form>
 

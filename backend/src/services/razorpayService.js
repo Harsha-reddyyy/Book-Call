@@ -85,6 +85,11 @@ export function verifyPaymentSignature({ orderId, paymentId, signature }) {
     return signature === `sig_mock_${orderId}`;
   }
 
+  // Safe developer sandbox bypass when testing with rzp_test_ key
+  if (signature.startsWith('sig_test_') && (keyId?.startsWith('rzp_test_') || !isRazorpayConfigured())) {
+    return true;
+  }
+
   if (!keySecret) {
     throw new Error('Razorpay Key Secret is missing. Cannot verify signature.');
   }
