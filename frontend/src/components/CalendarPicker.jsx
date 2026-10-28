@@ -202,7 +202,10 @@ export default function CalendarPicker({ onSlotSelect, selectedSlot }) {
         <div className="slots-header">
           <span className="slots-header-title">
             {selectedDate ? (
-              <>Available times for {new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>
+              <>Available times for {(() => {
+                const [y, m, d] = selectedDate.split('-').map(Number);
+                return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+              })()}</>
             ) : (
               'Select a date to view available times'
             )}
