@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Clock, Video, User, Award, Sparkles, CheckCircle2, TrendingUp } from 'lucide-react';
 
 export default function Hero() {
   const scrollToTopics = (e) => {
@@ -21,13 +21,11 @@ export default function Hero() {
             </div>
 
             <h1 className="hero-title">
-              Let's figure it out together.
+              Let's grow your YouTube & Instagram together.
             </h1>
 
             <p className="hero-lead">
-              Got questions about AI tools, YouTube growth, or creator workflows? Book a
-              one-on-one consultation with Harsha. Bring what you're working on, and let's
-              clear your doubts with zero fluff.
+              I started from zero on December 28, 2025, and grew to <strong>148K+ YouTube subscribers</strong> and <strong>25K+ Instagram followers</strong>. Got doubts about AI tools, video editing, scripts, or channel growth? Book a personal 1-on-1 call with me and let's solve your questions in simple, easy-to-understand English.
             </p>
 
             {/* Early Bird Offer Card */}
@@ -44,12 +42,12 @@ export default function Hero() {
                 </div>
                 <div className="offer-duration-tag">
                   <Clock size={15} />
-                  <span>30–40 Mins Deep Dive</span>
+                  <span>30–40 Mins 1-on-1 Call</span>
                 </div>
               </div>
               <p className="offer-hint">
                 <CheckCircle2 size={14} className="offer-check" />
-                <span>Direct 1-on-1 Google Meet · Instant calendar invite with 30m reminder</span>
+                <span>Direct Google Meet call · Instant calendar invite with 30-min reminder</span>
               </p>
             </div>
 
@@ -64,7 +62,7 @@ export default function Hero() {
                 onClick={scrollToTopics}
                 className="btn btn-secondary btn-lg"
               >
-                What We Discuss
+                What We Can Discuss
               </a>
             </div>
 
@@ -85,7 +83,7 @@ export default function Hero() {
               </div>
               <span>·</span>
               <div className="hero-meta-item">
-                <span>10 AM – 8 PM</span>
+                <span>10 AM – 8 PM IST</span>
               </div>
             </div>
           </div>
@@ -96,7 +94,7 @@ export default function Hero() {
               <div className="hero-image-wrapper">
                 <img
                   src="/images/harsha-silver-button.jpg"
-                  alt="Harsha with YouTube Silver Creator Award"
+                  alt="Harsha with YouTube Silver Creator Award - 148K Subscribers"
                   className="hero-creator-img"
                   loading="eager"
                 />
@@ -105,8 +103,8 @@ export default function Hero() {
                     <Award size={20} />
                   </div>
                   <div className="award-badge-text">
-                    <strong>100K+ Subscribers</strong>
-                    <span>YouTube Silver Creator Award</span>
+                    <strong>148K Subs · 25K+ Insta</strong>
+                    <span>Silver Play Button · Started Dec 28, 2025</span>
                   </div>
                 </div>
               </div>
@@ -114,7 +112,7 @@ export default function Hero() {
               <div className="hero-card-footer">
                 <div className="footer-author-info">
                   <span className="author-name">Harsha Talks</span>
-                  <span className="author-title">AI & Content Creator · 1-on-1 Mentorship</span>
+                  <span className="author-title">148K YouTube · 25K+ Instagram · 1-on-1 Call</span>
                 </div>
                 <span className="verified-pill">✓ Verified</span>
               </div>

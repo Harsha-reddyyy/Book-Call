@@ -3,28 +3,28 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    q: 'How does the consultation call take place?',
-    a: 'We connect online via Google Meet. As soon as your booking and ₹299 Early Bird payment are confirmed, a calendar event with a unique Google Meet link is automatically created and sent to your email. You can join directly from your browser or mobile phone without downloading extra software.',
+    q: 'How does the 1-on-1 call take place?',
+    a: 'We connect online on Google Meet. As soon as you complete the ₹299 booking, your Google Meet link is shown on screen and sent to your email with a 30-minute reminder before the call. You can join directly from your phone or laptop.',
   },
   {
-    q: 'How should I prepare before the call?',
-    a: 'When booking, write down what you want to achieve or the specific doubts you have. If you want feedback on a YouTube video, Short, or script draft, make sure you have the links or files ready to share at the start of our session so we can dive right in.',
+    q: 'What language will we speak in?',
+    a: 'We will speak in simple, clear everyday English. No difficult words or confusing jargon. You can ask your questions freely and comfortably!',
   },
   {
-    q: 'Can I reschedule if something comes up?',
-    a: 'Yes. You can reschedule your call free of charge up to 6 hours before the scheduled start time by emailing with your booking reference. Please check the Cancellation & Refund Policy for full details.',
+    q: 'How should I prepare before our call?',
+    a: 'Just write down what you want to achieve or the specific questions you have. If you want me to review your YouTube channel, Instagram account, or a video draft, keep the links ready so we can look at them together.',
   },
   {
-    q: 'What if I am a complete beginner with zero followers?',
-    a: 'That is completely fine! Everyone starts at the beginning. We can talk about how to select your niche, set up your basic workflow, choose tools without spending unnecessary money, and take your first steps with confidence.',
+    q: 'What if I am a complete beginner with 0 followers?',
+    a: 'Everyone starts at zero! I started my channel on Dec 28, 2025 with zero subscribers too. We will talk about how to choose your niche, which AI tools to use without wasting money, and how to get your first 1,000 subscribers.',
   },
   {
-    q: 'What payment methods do you accept?',
-    a: 'Payments are securely processed via Razorpay. You can pay using UPI (Google Pay, PhonePe, Paytm, etc.), credit and debit cards, or NetBanking.',
+    q: 'How do I pay?',
+    a: 'Payments are 100% secure via Razorpay. You can pay using UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, or NetBanking.',
   },
   {
-    q: 'Can the session be recorded?',
-    a: 'If you want to record the meeting for your personal reference so you can re-watch our discussion later, just let me know at the beginning of the call. I am happy to accommodate as long as it is for your private use.',
+    q: 'Can I reschedule if I get busy?',
+    a: 'Yes, you can reschedule for free up to 6 hours before our call by replying to your confirmation email.',
   },
 ];
 

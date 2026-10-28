@@ -3,27 +3,27 @@ import React from 'react';
 const topics = [
   {
     number: '01',
-    title: 'AI Tools & Workflows',
+    title: 'AI Tools for Creators',
     description:
-      'Discuss tools, practical everyday use cases, prompt techniques, and how to integrate AI directly into your creator workflow.',
+      'Learn the best free & paid AI tools to write scripts, create eye-catching thumbnails, and finish videos in half the time.',
   },
   {
     number: '02',
-    title: 'YouTube & Instagram',
+    title: 'YouTube Growth & Channel Setup',
     description:
-      'Discuss content ideas, packaging, YouTube Shorts, Instagram Reels, hooks, pacing, and retaining viewer attention.',
+      'How I grew to 148K subscribers: choosing viral video topics, writing catchy titles, good thumbnails, and getting more views.',
   },
   {
     number: '03',
-    title: 'Content Creation',
+    title: 'Instagram Reels & Personal Brand',
     description:
-      'Work through questions about getting started, overcoming consistency blocks, equipment choices, and improving your production process.',
+      'How to create reels that get followers, writing strong first-3-second hooks, simple editing styles, and staying consistent.',
   },
   {
     number: '04',
-    title: 'Your Specific Doubts',
+    title: 'Your Specific Doubts & Review',
     description:
-      'Bring your own raw questions, link your videos or draft ideas, and explain the exact puzzle you are currently trying to solve.',
+      'Share your YouTube channel link or video draft. I will review it live on the call and tell you exactly what to fix and improve.',
   },
 ];
 
@@ -32,11 +32,10 @@ export default function Topics() {
     <section id="topics" className="section-topics">
       <div className="container">
         <div className="section-header">
-          <div className="section-label">Consultation Topics</div>
-          <h2 className="section-title">What's on your mind?</h2>
+          <div className="section-label">What We Can Discuss</div>
+          <h2 className="section-title">Pick what you need help with</h2>
           <p className="section-subtitle">
-            Every session is focused entirely on you. You choose what we focus
-            on, and we spend the 20 minutes getting straight to the point.
+            Every session is 100% focused on you. We have 30–40 dedicated minutes on Google Meet to solve your exact doubts in simple, easy English.
           </p>
         </div>
 

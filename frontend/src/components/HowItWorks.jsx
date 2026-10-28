@@ -3,21 +3,21 @@ import React from 'react';
 const steps = [
   {
     step: '01',
-    title: 'Book your slot',
+    title: 'Pick your slot',
     description:
-      'Choose an available date and time that fits your schedule. All times are displayed in Indian Standard Time (IST).',
+      'Choose any date and time between 10:00 AM and 8:00 PM IST that fits your schedule.',
   },
   {
     step: '02',
-    title: 'Tell me your questions',
+    title: 'Tell me your doubts',
     description:
-      'Share the specific topics and doubts you want to discuss so I can review them beforehand and make every minute count.',
+      'Write down your questions or paste your YouTube/Instagram link so I can review it before our call.',
   },
   {
     step: '03',
-    title: 'Join the conversation',
+    title: 'Join on Google Meet',
     description:
-      'Complete your booking securely via Razorpay. You will immediately receive a Google Meet link and confirmation by email.',
+      'Pay ₹299 securely via UPI or Card. You get the Google Meet link immediately on your screen and email, plus a 30-min reminder.',
   },
 ];
 
