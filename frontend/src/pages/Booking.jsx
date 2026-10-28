@@ -233,7 +233,7 @@ export default function Booking() {
             <div className="booking-meta-bar">
               <div className="booking-meta-item">
                 <Clock size={16} />
-                <span>Duration: <strong>20 minutes</strong></span>
+                <span>Duration: <strong>30–40 mins</strong></span>
               </div>
               <span className="booking-meta-dot">·</span>
               <div className="booking-meta-item">
@@ -242,11 +242,11 @@ export default function Booking() {
               </div>
               <span className="booking-meta-dot">·</span>
               <div className="booking-meta-item">
-                <span>Fee: <strong>₹399 INR</strong></span>
+                <span>Fee: <strong style={{ color: 'var(--accent)' }}>₹299 INR</strong> <s style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginLeft: '4px' }}>₹499</s></span>
               </div>
               <span className="booking-meta-dot">·</span>
               <div className="booking-meta-item">
-                <span>Timezone: <strong>IST (UTC+05:30)</strong></span>
+                <span>Hours: <strong>10:00 AM – 8:00 PM IST</strong></span>
               </div>
             </div>
           </div>
@@ -402,6 +402,33 @@ export default function Booking() {
                   )}
                 </div>
 
+                {/* Early Bird Price Callout Box */}
+                <div
+                  style={{
+                    backgroundColor: 'rgba(244, 119, 33, 0.08)',
+                    border: '1px solid var(--accent-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '12px 16px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+                      ⚡ Early Bird Offer
+                    </span>
+                    <div style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
+                      30–40 min 1-on-1 session
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>₹299</span>
+                    <s style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '6px' }}>₹499</s>
+                  </div>
+                </div>
+
                 {/* Submit / Pay Button */}
                 <button
                   type="submit"
@@ -415,7 +442,7 @@ export default function Booking() {
                       <span>Processing...</span>
                     </>
                   ) : (
-                    <span>Book a Call — ₹399</span>
+                    <span>Book a Call — ₹299</span>
                   )}
                 </button>
 

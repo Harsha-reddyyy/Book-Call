@@ -74,6 +74,23 @@ export default function Confirmation() {
     }
   };
 
+  const getGoogleCalendarUrl = () => {
+    if (!booking) return '#';
+    const title = encodeURIComponent(`1-on-1 Consultation: ${booking.customerName} & Harsha`);
+    const startUtc = new Date(booking.startTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
+    const endUtc = new Date(booking.endTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
+    const meetUrl = booking.googleMeetUrl || '';
+    const details = encodeURIComponent(
+      `1-on-1 Consultation Call with Harsha\n` +
+      `Topic: ${booking.selectedTopic}\n` +
+      `Google Meet: ${meetUrl}\n` +
+      `Booking ID: ${booking.bookingId}\n` +
+      `Reminder: Please be ready 5 minutes before the scheduled time.`
+    );
+    const location = encodeURIComponent(meetUrl || 'Google Meet');
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${endUtc}&details=${details}&location=${location}`;
+  };
+
   if (loading) {
     return (
       <div>
@@ -157,7 +174,7 @@ export default function Confirmation() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <a
                     href={booking.googleMeetUrl}
                     target="_blank"
@@ -168,10 +185,21 @@ export default function Confirmation() {
                     <ExternalLink size={16} />
                   </a>
 
+                  <a
+                    href={getGoogleCalendarUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    title="Add to Google Calendar"
+                  >
+                    <Calendar size={16} />
+                    <span>Add to Calendar (30m reminder)</span>
+                  </a>
+
                   <button
                     type="button"
                     onClick={copyMeetLink}
-                    className="btn btn-secondary"
+                    className="btn btn-subtle"
                     title="Copy Meeting Link"
                   >
                     {copied ? <CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> : <Copy size={16} />}
@@ -186,6 +214,15 @@ export default function Confirmation() {
                     Your meeting details will be delivered directly to your email shortly.
                   </div>
                 </div>
+                <a
+                  href={getGoogleCalendarUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                >
+                  <Calendar size={16} />
+                  <span>Add to Calendar (30m reminder)</span>
+                </a>
               </div>
             )}
 
@@ -218,7 +255,7 @@ export default function Confirmation() {
 
                 <div className="confirmation-detail-item">
                   <span className="conf-label">Duration</span>
-                  <span className="conf-value">20 minutes</span>
+                  <span className="conf-value">30–40 minutes (1-on-1 Deep Dive)</span>
                 </div>
 
                 <div className="confirmation-detail-item">

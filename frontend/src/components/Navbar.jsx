@@ -106,7 +106,7 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <Link to="/book" className="btn btn-primary nav-cta">
-          <span>Book a Call — ₹399</span>
+          <span>Book a Call — ₹299</span>
           <ArrowRight size={16} />
         </Link>
 
@@ -202,9 +202,9 @@ export default function Navbar() {
             to="/book"
             onClick={() => setMobileOpen(false)}
             className="btn btn-primary"
-            style={{ marginTop: '8px' }}
+            style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}
           >
-            <span>Book a Call — ₹399</span>
+            <span>Book a Call — ₹299 (Early Bird)</span>
             <ArrowRight size={16} />
           </Link>
         </div>

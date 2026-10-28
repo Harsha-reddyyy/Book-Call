@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import { format as formatZoned } from 'date-fns-tz';
+import { generateGoogleCalendarUrl } from './calendarService.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -59,6 +60,7 @@ function buildConfirmationHtml(booking) {
   const formattedDate = formatZoned(new Date(booking.startTime), 'EEEE, MMMM d, yyyy', { timeZone });
   const formattedStartTime = formatZoned(new Date(booking.startTime), 'hh:mm a', { timeZone });
   const formattedEndTime = formatZoned(new Date(booking.endTime), 'hh:mm a', { timeZone });
+  const gcalUrl = generateGoogleCalendarUrl(booking);
 
   return `
 <!DOCTYPE html>
@@ -183,7 +185,7 @@ function buildConfirmationHtml(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Duration</span>
-        <span class="detail-value">20 minutes</span>
+        <span class="detail-value">30–40 minutes (1-on-1 Deep Dive)</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Topic</span>
@@ -194,8 +196,11 @@ function buildConfirmationHtml(booking) {
     ${
       booking.googleMeetUrl
         ? `
-      <p style="margin-bottom: 8px;"><strong>Join Online Meeting:</strong></p>
-      <a href="${booking.googleMeetUrl}" class="meet-btn" target="_blank">Join Google Meet</a>
+      <p style="margin-bottom: 8px;"><strong>Meeting Details & Calendar:</strong></p>
+      <div style="margin: 12px 0 16px 0;">
+        <a href="${booking.googleMeetUrl}" class="meet-btn" target="_blank" style="display: inline-block; background-color: #F47721; color: #FFFFFF !important; text-decoration: none; padding: 12px 22px; border-radius: 6px; font-weight: 600; font-size: 14px; margin-right: 10px; margin-bottom: 8px;">Join Google Meet</a>
+        <a href="${gcalUrl}" target="_blank" style="display: inline-block; background-color: #202020; color: #FFFFFF !important; text-decoration: none; padding: 12px 22px; border-radius: 6px; font-weight: 600; font-size: 14px; margin-bottom: 8px;">📅 Add to Google Calendar (30m reminder)</a>
+      </div>
       <p style="font-size: 13px; color: #6B6B6B;">Meeting link: <a href="${booking.googleMeetUrl}" style="color: #F47721;">${booking.googleMeetUrl}</a></p>
     `
         : `<p><em>Google Meet link is being generated and will be sent shortly.</em></p>`

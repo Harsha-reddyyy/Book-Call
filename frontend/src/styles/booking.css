@@ -432,7 +432,16 @@
 }
 
 /* Responsiveness */
+@media (max-width: 1024px) {
+  .booking-layout {
+    gap: 24px;
+  }
+}
+
 @media (max-width: 860px) {
+  .booking-page {
+    padding: 32px 0 60px;
+  }
   .booking-layout {
     grid-template-columns: 1fr;
   }
@@ -441,5 +450,68 @@
   }
   .confirmation-card {
     padding: 30px 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .booking-page {
+    padding: 20px 0 48px;
+  }
+  .booking-header {
+    margin-bottom: 20px;
+  }
+  .booking-header-title {
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+  .booking-meta-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .booking-meta-dot {
+    display: none;
+  }
+  .booking-card {
+    padding: 20px 16px;
+    border-radius: var(--radius-md);
+  }
+  .calendar-day-btn {
+    font-size: 0.88rem;
+    min-height: 38px;
+  }
+  .slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-height: 300px;
+    gap: 8px;
+  }
+  .slot-btn {
+    padding: 12px 6px;
+    font-size: 0.92rem;
+    min-height: 44px;
+  }
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    padding: 12px 14px;
+  }
+  .conf-meet-banner {
+    padding: 18px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+  .conf-meet-banner .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .conf-actions {
+    flex-direction: column;
+  }
+  .conf-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }

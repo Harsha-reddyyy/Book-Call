@@ -8,19 +8,19 @@ const availabilitySchema = new mongoose.Schema(
       type: [Number],
       default: [1, 2, 3, 4, 5, 6],
     },
-    // Working hours in 24h format HH:mm (IST)
+    // Working hours in 24h format HH:mm (IST) - 10:00 AM to 8:00 PM (20:00)
     workingHoursStart: {
       type: String,
       default: '10:00',
     },
     workingHoursEnd: {
       type: String,
-      default: '19:00',
+      default: '20:00',
     },
-    // Duration in minutes
+    // Duration in minutes (30-40 min sessions)
     sessionDuration: {
       type: Number,
-      default: 20,
+      default: 30,
       min: 10,
       max: 120,
     },
@@ -36,7 +36,7 @@ const availabilitySchema = new mongoose.Schema(
       {
         start: { type: String, required: true }, // e.g. "13:00"
         end: { type: String, required: true },   // e.g. "14:00"
-        label: { type: String, default: 'Break' },
+        label: { type: String, default: 'Lunch Break' },
       },
     ],
     // Blocked specific calendar dates (Format: 'YYYY-MM-DD')
@@ -57,11 +57,15 @@ const availabilitySchema = new mongoose.Schema(
       min: 1,
       max: 90,
     },
-    // Consultation price in INR
+    // Consultation price in INR: Early Bird ₹299 (Original ₹499)
     priceInr: {
       type: Number,
-      default: 399,
+      default: 299,
       min: 1,
+    },
+    originalPriceInr: {
+      type: Number,
+      default: 499,
     },
     timeZone: {
       type: String,

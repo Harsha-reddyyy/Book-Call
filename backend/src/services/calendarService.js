@@ -49,6 +49,7 @@ export async function createMeetingEvent(booking) {
         },
         attendees: [
           { email: booking.customerEmail, displayName: booking.customerName },
+          { email: process.env.ADMIN_DEFAULT_EMAIL || 'harshavardhanreddy.0712@gmail.com', displayName: 'Harsha' },
         ],
         conferenceData: {
           createRequest: {
@@ -59,8 +60,8 @@ export async function createMeetingEvent(booking) {
         reminders: {
           useDefault: false,
           overrides: [
-            { method: 'email', minutes: 24 * 60 },
-            { method: 'popup', minutes: 15 },
+            { method: 'email', minutes: 30 },
+            { method: 'popup', minutes: 30 },
           ],
         },
       };
@@ -103,4 +104,24 @@ export async function createMeetingEvent(booking) {
     error: null,
     isMock: true,
   };
+}
+
+/**
+ * Generate a 1-click Google Calendar web URL with meeting link and details
+ */
+export function generateGoogleCalendarUrl(booking) {
+  const title = encodeURIComponent(`1-on-1 Consultation: ${booking.customerName} & Harsha`);
+  const startUtc = new Date(booking.startTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  const endUtc = new Date(booking.endTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  const meetUrl = booking.googleMeetUrl || '';
+  const details = encodeURIComponent(
+    `1-on-1 Personal Consultation Call with Harsha\n` +
+    `Topic: ${booking.selectedTopic}\n` +
+    `Google Meet: ${meetUrl}\n` +
+    `Booking ID: ${booking.bookingId}\n` +
+    `Client: ${booking.customerName} (${booking.customerEmail})\n\n` +
+    `Reminder: Please be ready 5 minutes before the call starts.`
+  );
+  const location = encodeURIComponent(meetUrl || 'Google Meet (Online)');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${endUtc}&details=${details}&location=${location}`;
 }

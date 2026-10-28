@@ -19,6 +19,7 @@ router.get('/settings', publicApiLimiter, async (req, res, next) => {
         workingHoursEnd: settings.workingHoursEnd,
         sessionDuration: settings.sessionDuration,
         priceInr: settings.priceInr,
+        originalPriceInr: settings.originalPriceInr || 499,
         timeZone: settings.timeZone,
         minimumNoticeHours: settings.minimumNoticeHours,
         maxAdvanceDays: settings.maxAdvanceDays,

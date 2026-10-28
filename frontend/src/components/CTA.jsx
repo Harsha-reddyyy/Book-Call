@@ -15,13 +15,13 @@ export default function CTA() {
           </p>
 
           <Link to="/book" className="btn btn-primary btn-lg">
-            <span>Book Your Call — ₹399</span>
+            <span>Book Your Call — ₹299</span>
             <ArrowRight size={18} />
           </Link>
 
           <div className="hero-meta-item cta-subtext">
             <Clock size={15} />
-            <span>20-minute dedicated one-on-one session on Google Meet</span>
+            <span>30–40 minute dedicated 1-on-1 session on Google Meet · 10 AM – 8 PM IST</span>
           </div>
         </div>
       </div>

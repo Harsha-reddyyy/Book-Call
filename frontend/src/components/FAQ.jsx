@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 const faqs = [
   {
     q: 'How does the consultation call take place?',
-    a: 'We connect online via Google Meet. As soon as your booking and ₹399 payment are confirmed, a calendar event with a unique Google Meet link is automatically created and sent to your email. You can join directly from your browser or mobile phone without downloading extra software.',
+    a: 'We connect online via Google Meet. As soon as your booking and ₹299 Early Bird payment are confirmed, a calendar event with a unique Google Meet link is automatically created and sent to your email. You can join directly from your browser or mobile phone without downloading extra software.',
   },
   {
     q: 'How should I prepare before the call?',
