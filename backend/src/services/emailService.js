@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
-import { format as formatZoned } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 import { generateGoogleCalendarUrl } from './calendarService.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -57,9 +57,9 @@ if (isGmailConfigured()) {
  */
 function buildConfirmationHtml(booking) {
   const timeZone = booking.timeZone || 'Asia/Kolkata';
-  const formattedDate = formatZoned(new Date(booking.startTime), 'EEEE, MMMM d, yyyy', { timeZone });
-  const formattedStartTime = formatZoned(new Date(booking.startTime), 'hh:mm a', { timeZone });
-  const formattedEndTime = formatZoned(new Date(booking.endTime), 'hh:mm a', { timeZone });
+  const formattedDate = formatInTimeZone(new Date(booking.startTime), timeZone, 'EEEE, MMMM d, yyyy');
+  const formattedStartTime = formatInTimeZone(new Date(booking.startTime), timeZone, 'hh:mm a');
+  const formattedEndTime = formatInTimeZone(new Date(booking.endTime), timeZone, 'hh:mm a');
   const gcalUrl = generateGoogleCalendarUrl(booking);
 
   return `

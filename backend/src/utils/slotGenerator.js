@@ -1,5 +1,5 @@
 import { parse, addMinutes, format, isBefore, isAfter, startOfDay, addDays } from 'date-fns';
-import { toZonedTime, fromZonedTime, format as formatZoned } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 
 const TIMEZONE = 'Asia/Kolkata';
 
@@ -116,13 +116,14 @@ export function generateDaySlots(dateStr, availabilitySettings, existingBookings
 
         if (!hasCollision) {
           // Format user-friendly time string (e.g. "10:00 AM")
-          const formattedTime = formatZoned(slotStartDate, 'hh:mm a', { timeZone });
+          const formattedTime = formatInTimeZone(slotStartDate, timeZone, 'hh:mm a');
+          const formattedEndTime = formatInTimeZone(slotEndDate, timeZone, 'hh:mm a');
           slots.push({
             date: dateStr,
             startTime: slotStartDate.toISOString(),
             endTime: slotEndDate.toISOString(),
             formattedTime,
-            formattedRange: `${formattedTime} – ${formatZoned(slotEndDate, 'hh:mm a', { timeZone })}`,
+            formattedRange: `${formattedTime} – ${formattedEndTime}`,
             durationMinutes: sessionDuration,
             timeZone,
           });

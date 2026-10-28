@@ -4,7 +4,7 @@ import { Availability } from '../models/Availability.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { createMeetingEvent } from '../services/calendarService.js';
 import { sendBookingConfirmation } from '../services/emailService.js';
-import { format as formatZoned } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 const router = express.Router();
 
@@ -264,8 +264,8 @@ router.get('/export-csv', async (req, res, next) => {
 
     const rows = bookings.map((b) => {
       const timeZone = b.timeZone || 'Asia/Kolkata';
-      const startFormatted = formatZoned(new Date(b.startTime), 'yyyy-MM-dd hh:mm a', { timeZone });
-      const endFormatted = formatZoned(new Date(b.endTime), 'yyyy-MM-dd hh:mm a', { timeZone });
+      const startFormatted = formatInTimeZone(new Date(b.startTime), timeZone, 'yyyy-MM-dd hh:mm a');
+      const endFormatted = formatInTimeZone(new Date(b.endTime), timeZone, 'yyyy-MM-dd hh:mm a');
 
       const escape = (val) => `"${String(val || '').replace(/"/g, '""')}"`;
 
