@@ -72,8 +72,8 @@ export default function Footer() {
                 <Instagram size={15} />
                 <span>Instagram (@harsha.talkss)</span>
               </a>
-              <a href="mailto:harsha@example.com" className="footer-link">
-                harsha@example.com
+              <a href="mailto:harshavardhanreddy.0712@gmail.com" className="footer-link">
+                harshavardhanreddy.0712@gmail.com
               </a>
             </div>
 

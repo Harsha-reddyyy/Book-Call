@@ -10,7 +10,7 @@ export async function ensureDefaultAdminAndData() {
   if (adminCount === 0) {
     const defaultUsername = process.env.ADMIN_DEFAULT_USERNAME || 'harsha';
     const defaultPassword = process.env.ADMIN_DEFAULT_PASSWORD || 'Harsha@2026';
-    const defaultEmail = process.env.ADMIN_DEFAULT_EMAIL || 'harsha@example.com';
+    const defaultEmail = process.env.ADMIN_DEFAULT_EMAIL || 'harshavardhanreddy.0712@gmail.com';
 
     const passwordHash = await Admin.hashPassword(defaultPassword);
     await Admin.create({
