@@ -469,15 +469,17 @@ export default function Booking() {
                   )}
                 </button>
 
-                {/* 1-Click Sandbox Test Option (responsive wrapping) */}
-                <button
-                  type="button"
-                  onClick={(e) => handleBookingSubmit(e, true)}
-                  className="btn booking-test-mode-btn"
-                  disabled={isSubmitting || !selectedSlot}
-                >
-                  <span>⚡ Test Mode: 1-Click Instant Complete (Skip Popup)</span>
-                </button>
+                {/* 1-Click Sandbox Test Option (only available in development) */}
+                {import.meta.env.DEV && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleBookingSubmit(e, true)}
+                    className="btn booking-test-mode-btn"
+                    disabled={isSubmitting || !selectedSlot}
+                  >
+                    <span>⚡ Test Mode: 1-Click Instant Complete (Skip Popup)</span>
+                  </button>
+                )}
               </form>
 
               {/* Trust Badges */}
