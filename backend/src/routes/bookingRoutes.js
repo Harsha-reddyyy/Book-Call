@@ -23,6 +23,7 @@ router.post('/reserve', bookingLimiter, async (req, res, next) => {
     const {
       customerName,
       customerEmail,
+      customerPhone,
       selectedTopic,
       customerQuestions,
       startTime,
@@ -35,6 +36,9 @@ router.post('/reserve', bookingLimiter, async (req, res, next) => {
     }
     if (!customerEmail || !/^\S+@\S+\.\S+$/.test(customerEmail.trim())) {
       return res.status(400).json({ success: false, message: 'A valid email address is required.' });
+    }
+    if (!customerPhone || !customerPhone.trim()) {
+      return res.status(400).json({ success: false, message: 'Mobile or WhatsApp number is required.' });
     }
     const validTopics = [
       'AI tools',
@@ -138,6 +142,7 @@ router.post('/reserve', bookingLimiter, async (req, res, next) => {
       bookingId,
       customerName: customerName.trim(),
       customerEmail: customerEmail.trim().toLowerCase(),
+      customerPhone: customerPhone.trim(),
       selectedTopic,
       customerQuestions: customerQuestions.trim(),
       startTime: start,
@@ -164,6 +169,7 @@ router.post('/reserve', bookingLimiter, async (req, res, next) => {
       customerDetails: {
         name: booking.customerName,
         email: booking.customerEmail,
+        phone: booking.customerPhone,
       },
     });
   } catch (err) {

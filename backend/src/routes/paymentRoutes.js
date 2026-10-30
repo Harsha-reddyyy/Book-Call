@@ -5,7 +5,7 @@ import {
   verifyWebhookSignature,
 } from '../services/razorpayService.js';
 import { createMeetingEvent } from '../services/calendarService.js';
-import { sendBookingConfirmation } from '../services/emailService.js';
+import { sendBookingConfirmation, sendHostNotification } from '../services/emailService.js';
 
 const router = express.Router();
 
@@ -33,7 +33,7 @@ async function fulfillBooking(booking) {
     }
   }
 
-  // 2. Email confirmation delivery
+  // 2. Email confirmation delivery to customer
   if (booking.emailStatus !== 'sent') {
     try {
       const emailResult = await sendBookingConfirmation(booking);
@@ -48,6 +48,13 @@ async function fulfillBooking(booking) {
       booking.emailStatus = 'failed';
       booking.emailError = err.message;
     }
+  }
+
+  // 3. Email notification alert to Host (Harsha)
+  try {
+    await sendHostNotification(booking);
+  } catch (hostErr) {
+    console.error('[Host Notification Error]', hostErr.message);
   }
 
   await booking.save();

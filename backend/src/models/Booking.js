@@ -24,6 +24,12 @@ const bookingSchema = new mongoose.Schema(
       index: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
+    customerPhone: {
+      type: String,
+      trim: true,
+      maxlength: [25, 'Phone number cannot exceed 25 characters'],
+      default: '',
+    },
     selectedTopic: {
       type: String,
       required: [true, 'Topic selection is required'],

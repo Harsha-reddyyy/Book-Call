@@ -359,6 +359,13 @@ export default function Confirmation() {
                   <span className="conf-label">Customer</span>
                   <span className="conf-value">{booking.customerName}</span>
                 </div>
+
+                {booking.customerPhone && (
+                  <div className="confirmation-detail-item">
+                    <span className="conf-label">Phone / WhatsApp</span>
+                    <span className="conf-value">{booking.customerPhone}</span>
+                  </div>
+                )}
               </div>
             </div>
 

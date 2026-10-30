@@ -191,6 +191,16 @@ function buildConfirmationHtml(booking) {
         <span class="detail-label">Topic</span>
         <span class="detail-value">${booking.selectedTopic}</span>
       </div>
+      ${
+        booking.customerPhone
+          ? `
+      <div class="detail-row">
+        <span class="detail-label">Mobile / WhatsApp</span>
+        <span class="detail-value">${booking.customerPhone}</span>
+      </div>
+      `
+          : ''
+      }
     </div>
 
     ${
@@ -327,4 +337,293 @@ export async function sendBookingConfirmation(booking) {
   // Graceful development simulation log
   console.log(`[Email Simulated] To: ${booking.customerEmail} | Subject: ${subject}`);
   return { success: true, emailId: `mock_email_${Date.now()}`, error: null, isMock: true };
+}
+
+/**
+ * Format host notification HTML template for Harsha
+ */
+function buildHostNotificationHtml(booking) {
+  const timeZone = booking.timeZone || 'Asia/Kolkata';
+  const formattedDate = formatInTimeZone(new Date(booking.startTime), timeZone, 'EEEE, MMMM d, yyyy');
+  const formattedStartTime = formatInTimeZone(new Date(booking.startTime), timeZone, 'hh:mm a');
+  const formattedEndTime = formatInTimeZone(new Date(booking.endTime), timeZone, 'hh:mm a');
+  const gcalHostUrl = generateGoogleCalendarUrl(booking, true);
+  const rawPhone = booking.customerPhone?.replace(/[^\d]/g, '') || '';
+  const waUrl = rawPhone ? `https://wa.me/${rawPhone}` : null;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #FAF9F6;
+      color: #202020;
+      margin: 0;
+      padding: 30px 15px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border: 1px solid #E8E5DF;
+      border-radius: 8px;
+      padding: 36px 32px;
+    }
+    .badge {
+      display: inline-block;
+      background-color: #F47721;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #202020;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.02em;
+    }
+    .details-box {
+      background-color: #FAF9F6;
+      border: 1px solid #E8E5DF;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #EFECE6;
+      font-size: 14px;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      color: #6B6B6B;
+      font-weight: 500;
+    }
+    .detail-value {
+      font-weight: 600;
+      color: #202020;
+      text-align: right;
+    }
+    .questions-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: #FFFFFF;
+      border: 1px solid #E8E5DF;
+      border-radius: 6px;
+    }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-primary {
+      background-color: #F47721;
+      color: #FFFFFF !important;
+    }
+    .btn-secondary {
+      background-color: #202020;
+      color: #FFFFFF !important;
+    }
+    .btn-wa {
+      background-color: #25D366;
+      color: #FFFFFF !important;
+    }
+    .footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #E8E5DF;
+      font-size: 13px;
+      color: #6B6B6B;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">New Booking Confirmed</div>
+    <h1>${booking.customerName} booked a consultation</h1>
+    <p style="color: #4A4A4A; font-size: 15px; margin-top: 0;">
+      A new 1-on-1 consultation session has been scheduled and paid via Razorpay (₹${(booking.amountPaise / 100).toFixed(0)}).
+    </p>
+
+    <div class="details-box">
+      <div class="detail-row">
+        <span class="detail-label">Client Name</span>
+        <span class="detail-value">${booking.customerName}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Client Email</span>
+        <span class="detail-value"><a href="mailto:${booking.customerEmail}" style="color: #F47721;">${booking.customerEmail}</a></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Client Phone / WhatsApp</span>
+        <span class="detail-value">
+          ${booking.customerPhone || 'Not provided'}
+          ${waUrl ? ` · <a href="${waUrl}" style="color: #25D366; text-decoration: none; font-weight: 600;" target="_blank">Chat WhatsApp</a>` : ''}
+        </span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Booking ID</span>
+        <span class="detail-value" style="font-family: monospace;">${booking.bookingId}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date</span>
+        <span class="detail-value">${formattedDate}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Time</span>
+        <span class="detail-value">${formattedStartTime} – ${formattedEndTime} (IST)</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Topic</span>
+        <span class="detail-value">${booking.selectedTopic}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Payment ID</span>
+        <span class="detail-value" style="font-family: monospace;">${booking.razorpayPaymentId || 'Verified'}</span>
+      </div>
+    </div>
+
+    ${
+      booking.googleMeetUrl
+        ? `
+      <div style="margin: 20px 0;">
+        <p style="font-weight: 600; margin-bottom: 8px;">Meeting Room & Calendar:</p>
+        <a href="${booking.googleMeetUrl}" class="btn btn-primary" target="_blank">🎥 Open Google Meet</a>
+        <a href="${gcalHostUrl}" class="btn btn-secondary" target="_blank">📅 Add to My Google Calendar</a>
+        <p style="font-size: 13px; color: #6B6B6B; margin-top: 6px;">
+          Meet Link: <a href="${booking.googleMeetUrl}" style="color: #F47721;">${booking.googleMeetUrl}</a>
+        </p>
+      </div>
+    `
+        : ''
+    }
+
+    <div class="questions-box">
+      <p style="margin: 0 0 6px 0; font-weight: 600; font-size: 14px; color: #202020;">What ${booking.customerName} shared with you:</p>
+      <p style="font-size: 14px; color: #4A4A4A; white-space: pre-line; margin: 0;">${booking.customerQuestions}</p>
+    </div>
+
+    <div class="footer">
+      <p style="margin: 0 0 4px 0;">You can reply directly to this email to get in touch with <strong>${booking.customerName}</strong> (${booking.customerEmail}).</p>
+      <p style="margin: 0; color: #9B9B9B; font-size: 12px;">Harsha Consultations Automated Booking Engine</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Send notification email to Harsha (Host) when a consultation is booked
+ */
+export async function sendHostNotification(booking) {
+  const hostEmail = process.env.ADMIN_DEFAULT_EMAIL || 'harshavardhanreddy.0712@gmail.com';
+  const subject = `⚡ New Booking: ${booking.customerName} — ${booking.bookingId} (${booking.selectedTopic})`;
+  const html = buildHostNotificationHtml(booking);
+
+  // 1. Brevo HTTPS API
+  if (isBrevoConfigured()) {
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: {
+            name: 'Harsha Booking Bot',
+            email: brevoSenderEmail,
+          },
+          to: [
+            {
+              email: hostEmail,
+              name: 'Harsha',
+            },
+          ],
+          replyTo: {
+            email: booking.customerEmail,
+            name: booking.customerName,
+          },
+          subject,
+          htmlContent: html,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `Brevo API HTTP ${response.status}`);
+      }
+
+      console.log(`[Email] Host notification delivered to ${hostEmail} (MessageId: ${data.messageId})`);
+      return { success: true, emailId: data.messageId, error: null };
+    } catch (err) {
+      console.error('[Brevo Error] Host notification failed:', err.message);
+    }
+  }
+
+  // 2. Gmail SMTP
+  if (isGmailConfigured() && gmailTransporter) {
+    try {
+      const info = await gmailTransporter.sendMail({
+        from: `"Harsha Booking Bot" <${gmailUser}>`,
+        to: hostEmail,
+        replyTo: booking.customerEmail,
+        subject,
+        html,
+      });
+
+      console.log(`[Email] Host notification sent to ${hostEmail} (ID: ${info.messageId})`);
+      return { success: true, emailId: info.messageId, error: null };
+    } catch (err) {
+      console.error('[Gmail Error] Host notification failed:', err.message);
+    }
+  }
+
+  // 3. Resend API
+  if (isResendConfigured() && resend) {
+    try {
+      const response = await resend.emails.send({
+        from: emailFrom,
+        to: [hostEmail],
+        reply_to: booking.customerEmail,
+        subject,
+        html,
+      });
+
+      if (response.error) {
+        console.warn('[Resend Host Warning]', response.error.message);
+        return { success: false, emailId: null, error: response.error.message };
+      }
+
+      console.log(`[Email] Host notification sent to ${hostEmail} (ID: ${response.data?.id})`);
+      return { success: true, emailId: response.data?.id, error: null };
+    } catch (err) {
+      console.error('[Email Error] Host notification failed:', err.message);
+      return { success: false, emailId: null, error: err.message };
+    }
+  }
+
+  console.log(`[Email Simulated Host Alert] To: ${hostEmail} | Subject: ${subject}`);
+  return { success: true, emailId: `mock_host_${Date.now()}`, error: null, isMock: true };
 }

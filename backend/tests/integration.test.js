@@ -29,6 +29,7 @@ describe('End-to-End Booking Lifecycle & Concurrency Integration', () => {
       bookingId: 'BK-TEST01',
       customerName: 'Test Customer',
       customerEmail: 'customer@example.com',
+      customerPhone: '+91 9876543210',
       selectedTopic: 'AI tools',
       customerQuestions: 'How do I automate my video editing workflow?',
       startTime,

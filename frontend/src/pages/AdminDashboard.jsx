@@ -448,6 +448,11 @@ export default function AdminDashboard() {
                               <td>
                                 <div className="table-cust-name">{b.customerName}</div>
                                 <div className="table-cust-email">{b.customerEmail}</div>
+                                {b.customerPhone && (
+                                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                    📞 <a href={`tel:${b.customerPhone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{b.customerPhone}</a>
+                                  </div>
+                                )}
                               </td>
                               <td>{b.selectedTopic}</td>
                               <td>
@@ -531,6 +536,11 @@ export default function AdminDashboard() {
                             <div className="admin-card-cust">
                               <strong>{b.customerName}</strong>
                               <span className="admin-card-email">{b.customerEmail}</span>
+                              {b.customerPhone && (
+                                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                                  📞 {b.customerPhone}
+                                </span>
+                              )}
                             </div>
 
                             <div className="admin-card-meta-row">
@@ -905,6 +915,29 @@ export default function AdminDashboard() {
               <div>
                 <span className="conf-label">Customer Email</span>
                 <div style={{ fontWeight: 600, wordBreak: 'break-all' }}>{selectedBooking.customerEmail}</div>
+              </div>
+              <div>
+                <span className="conf-label">Phone / WhatsApp</span>
+                <div style={{ fontWeight: 600 }}>
+                  {selectedBooking.customerPhone ? (
+                    <span>
+                      <a href={`tel:${selectedBooking.customerPhone}`} style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+                        {selectedBooking.customerPhone}
+                      </a>
+                      {' · '}
+                      <a
+                        href={`https://wa.me/${selectedBooking.customerPhone.replace(/[^\d]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#25D366', fontWeight: 600, textDecoration: 'none' }}
+                      >
+                        WhatsApp
+                      </a>
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)' }}>Not provided</span>
+                  )}
+                </div>
               </div>
               <div>
                 <span className="conf-label">Topic</span>

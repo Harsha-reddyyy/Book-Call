@@ -38,6 +38,7 @@ router.get('/bookings', async (req, res, next) => {
       query.$or = [
         { customerName: searchRegex },
         { customerEmail: searchRegex },
+        { customerPhone: searchRegex },
         { bookingId: searchRegex },
       ];
     }

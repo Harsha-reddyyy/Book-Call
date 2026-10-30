@@ -38,6 +38,7 @@ export default function Booking() {
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
+    customerPhone: '',
     selectedTopic: 'AI tools',
     customerQuestions: '',
   });
@@ -46,9 +47,6 @@ export default function Booking() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
-
-  // Simulated test payment modal state (for dev mode)
-  const [mockPaymentModal, setMockPaymentModal] = useState(null);
 
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
@@ -84,6 +82,11 @@ export default function Booking() {
     } else if (!/^\S+@\S+\.\S+$/.test(formData.customerEmail.trim())) {
       newErrors.customerEmail = 'Please provide a valid email address.';
     }
+    if (!formData.customerPhone.trim()) {
+      newErrors.customerPhone = 'Mobile or WhatsApp number is required.';
+    } else if (!/^[0-9+() -]{8,20}$/.test(formData.customerPhone.trim())) {
+      newErrors.customerPhone = 'Please provide a valid phone number (at least 10 digits).';
+    }
     if (!formData.selectedTopic) {
       newErrors.selectedTopic = 'Please select a topic.';
     }
@@ -97,12 +100,20 @@ export default function Booking() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBookingSubmit = async (e, isInstantTest = false) => {
+  const handleBookingSubmit = async (e) => {
     if (e) e.preventDefault();
 
     if (!validate()) {
       const firstError = Object.values(errors)[0] || 'Please fill in all required fields.';
       setToast({ type: 'error', message: firstError });
+      return;
+    }
+
+    if (!window.Razorpay) {
+      setToast({
+        type: 'error',
+        message: 'Payment gateway is initializing. Please refresh the page or check your connection.',
+      });
       return;
     }
 
@@ -113,6 +124,7 @@ export default function Booking() {
       const reservation = await api.reserveSlot({
         customerName: formData.customerName.trim(),
         customerEmail: formData.customerEmail.trim(),
+        customerPhone: formData.customerPhone.trim(),
         selectedTopic: formData.selectedTopic,
         customerQuestions: formData.customerQuestions.trim(),
         startTime: selectedSlot.startTime,
@@ -123,128 +135,77 @@ export default function Booking() {
         throw new Error(reservation.message || 'Could not reserve slot.');
       }
 
-      // 2. Payment Gateway handling
-      if (isInstantTest || reservation.isMockPayment || !window.Razorpay) {
-        // Safe development simulation modal
-        setMockPaymentModal({
-          bookingId: reservation.bookingId,
-          orderId: reservation.orderId,
-          amountDisplay: reservation.amountDisplay || '₹299',
-        });
-        setIsSubmitting(false);
-      } else {
-        // Real Razorpay Checkout Modal
-        const options = {
-          key: reservation.keyId,
-          amount: reservation.amount,
-          currency: reservation.currency || 'INR',
-          name: 'Harsha Consultation',
-          description: `30–40 min 1-on-1 Call (${formData.selectedTopic})`,
-          order_id: reservation.orderId,
-          prefill: {
-            name: formData.customerName,
-            email: formData.customerEmail,
-          },
-          theme: {
-            color: '#F47721',
-          },
-          handler: async function (response) {
-            try {
-              setIsSubmitting(true);
-              const verifyRes = await api.verifyPayment({
-                bookingId: reservation.bookingId,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
+      // 2. Real Razorpay Checkout Modal
+      const options = {
+        key: reservation.keyId,
+        amount: reservation.amount,
+        currency: reservation.currency || 'INR',
+        name: 'Harsha Consultation',
+        description: `30–40 min 1-on-1 Call (${formData.selectedTopic})`,
+        order_id: reservation.orderId,
+        prefill: {
+          name: formData.customerName,
+          email: formData.customerEmail,
+          contact: formData.customerPhone,
+        },
+        theme: {
+          color: '#F47721',
+        },
+        handler: async function (response) {
+          try {
+            setIsSubmitting(true);
+            const verifyRes = await api.verifyPayment({
+              bookingId: reservation.bookingId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.success) {
+              if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+              }
+              navigate(`/confirmation/${reservation.bookingId}`, {
+                state: {
+                  booking: verifyRes.booking,
+                  fromPayment: true,
+                },
               });
-
-              if (verifyRes.success) {
-                if (document.activeElement && typeof document.activeElement.blur === 'function') {
-                  document.activeElement.blur();
-                }
-                navigate(`/confirmation/${reservation.bookingId}`, {
-                  state: {
-                    booking: verifyRes.booking,
-                    fromPayment: true,
-                  },
-                });
-              } else {
-                throw new Error(verifyRes.message || 'Payment verification failed.');
-              }
-            } catch (vErr) {
-              setToast({ type: 'error', message: vErr.message });
-              setIsSubmitting(false);
+            } else {
+              throw new Error(verifyRes.message || 'Payment verification failed.');
             }
+          } catch (vErr) {
+            setToast({ type: 'error', message: vErr.message });
+            setIsSubmitting(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setIsSubmitting(false);
+            setToast({
+              type: 'info',
+              message: 'Payment window closed. Your slot is held for 10 minutes if you want to complete it.',
+            });
           },
-          modal: {
-            ondismiss: function () {
-              setIsSubmitting(false);
-              if (reservation.keyId?.startsWith('rzp_test_')) {
-                setMockPaymentModal({
-                  bookingId: reservation.bookingId,
-                  orderId: reservation.orderId,
-                  amountDisplay: reservation.amountDisplay || '₹299',
-                });
-              } else {
-                setToast({
-                  type: 'info',
-                  message: 'Payment cancelled. Your slot is held for 10 minutes if you want to complete it.',
-                });
-              }
-            },
-          },
-        };
+        },
+      };
 
-        const razorpayInstance = new window.Razorpay(options);
-        razorpayInstance.on('payment.failed', function (response) {
-          setIsSubmitting(false);
-          setToast({
-            type: 'error',
-            message: `Payment failed: ${response.error.description || 'Transaction unsuccessful'}`,
-          });
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.on('payment.failed', function (response) {
+        setIsSubmitting(false);
+        setToast({
+          type: 'error',
+          message: `Payment failed: ${response.error?.description || 'Transaction unsuccessful'}`,
         });
+      });
 
-        razorpayInstance.open();
-      }
+      razorpayInstance.open();
     } catch (err) {
       setIsSubmitting(false);
       setToast({
         type: 'error',
         message: err.message || 'An error occurred while creating your reservation.',
       });
-    }
-  };
-
-  // Complete simulated test payment
-  const completeSimulatedPayment = async () => {
-    if (!mockPaymentModal) return;
-    setIsSubmitting(true);
-
-    try {
-      const verifyRes = await api.verifyPayment({
-        bookingId: mockPaymentModal.bookingId,
-        razorpay_order_id: mockPaymentModal.orderId,
-        razorpay_payment_id: `pay_test_${Date.now()}`,
-        razorpay_signature: `sig_test_${mockPaymentModal.orderId}`,
-      });
-
-      if (verifyRes.success) {
-        setMockPaymentModal(null);
-        if (document.activeElement && typeof document.activeElement.blur === 'function') {
-          document.activeElement.blur();
-        }
-        navigate(`/confirmation/${mockPaymentModal.bookingId}`, {
-          state: {
-            booking: verifyRes.booking,
-            fromPayment: true,
-          },
-        });
-      } else {
-        throw new Error(verifyRes.message || 'Simulated verification failed.');
-      }
-    } catch (err) {
-      setIsSubmitting(false);
-      setToast({ type: 'error', message: err.message });
     }
   };
 
@@ -396,6 +357,29 @@ export default function Booking() {
                   )}
                 </div>
 
+                {/* Mobile / WhatsApp Number */}
+                <div className="form-group">
+                  <label htmlFor="customerPhone" className="form-label">
+                    Mobile / WhatsApp Number <span className="required">*</span>
+                  </label>
+                  <input
+                    id="customerPhone"
+                    type="tel"
+                    name="customerPhone"
+                    value={formData.customerPhone}
+                    onChange={handleInputChange}
+                    placeholder="e.g. +91 98765 43210"
+                    className={`form-input ${errors.customerPhone ? 'error' : ''}`}
+                    disabled={isSubmitting}
+                  />
+                  <div className="form-hint">
+                    Required for meeting reminder and WhatsApp consultation updates.
+                  </div>
+                  {errors.customerPhone && (
+                    <div className="form-error">{errors.customerPhone}</div>
+                  )}
+                </div>
+
                 {/* Primary Topic */}
                 <div className="form-group">
                   <label htmlFor="selectedTopic" className="form-label">
@@ -468,18 +452,6 @@ export default function Booking() {
                     <span>Book a Call — ₹299</span>
                   )}
                 </button>
-
-                {/* 1-Click Sandbox Test Option (only available in development) */}
-                {import.meta.env.DEV && (
-                  <button
-                    type="button"
-                    onClick={(e) => handleBookingSubmit(e, true)}
-                    className="btn booking-test-mode-btn"
-                    disabled={isSubmitting || !selectedSlot}
-                  >
-                    <span>⚡ Test Mode: 1-Click Instant Complete (Skip Popup)</span>
-                  </button>
-                )}
               </form>
 
               {/* Trust Badges */}
@@ -506,53 +478,6 @@ export default function Booking() {
           </div>
         </div>
       </main>
-
-      {/* Simulated Dev Payment Modal */}
-      {mockPaymentModal && (
-        <div className="modal-overlay">
-          <div className="modal-content modal-content-sm">
-            <div className="modal-header">
-              <h3 className="modal-title">Simulated Payment Checkout</h3>
-            </div>
-            <p style={{ marginBottom: '16px', fontSize: '0.94rem', color: 'var(--text-secondary)' }}>
-              Razorpay is currently in safe development test mode. In production with live keys, this opens the official Razorpay Checkout popup.
-            </p>
-            <div className="modal-payment-summary">
-              <div className="payment-summary-row">
-                <span>Booking ID:</span>
-                <strong>{mockPaymentModal.bookingId}</strong>
-              </div>
-              <div className="payment-summary-row">
-                <span>Amount:</span>
-                <strong>{mockPaymentModal.amountDisplay}</strong>
-              </div>
-              <div className="payment-summary-row">
-                <span>Status:</span>
-                <span className="badge badge-accent">Ready for Payment</span>
-              </div>
-            </div>
-            <div className="modal-actions-row">
-              <button
-                type="button"
-                className="btn btn-primary"
-                style={{ flex: 1 }}
-                onClick={completeSimulatedPayment}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Verifying...' : 'Complete Test Payment (₹299)'}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setMockPaymentModal(null)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {toast && (
         <Toast

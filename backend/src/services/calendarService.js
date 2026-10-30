@@ -38,7 +38,7 @@ export async function createMeetingEvent(booking) {
 
       const eventPayload = {
         summary: `1-on-1 Consultation: ${booking.customerName} & Harsha`,
-        description: `Consultation Call with Harsha\n\nTopic: ${booking.selectedTopic}\nQuestions / Doubts:\n${booking.customerQuestions}\n\nClient: ${booking.customerName} (${booking.customerEmail})\nBooking ID: ${booking.bookingId}`,
+        description: `Consultation Call with Harsha\n\nTopic: ${booking.selectedTopic}\nQuestions / Doubts:\n${booking.customerQuestions}\n\nClient: ${booking.customerName} (${booking.customerEmail}${booking.customerPhone ? ` · ${booking.customerPhone}` : ''})\nBooking ID: ${booking.bookingId}`,
         start: {
           dateTime: new Date(booking.startTime).toISOString(),
           timeZone: booking.timeZone || 'Asia/Kolkata',
@@ -95,8 +95,19 @@ export async function createMeetingEvent(booking) {
     }
   }
 
-  // Graceful fallback for local development or when credentials are not yet set
-  // Generate a realistic meeting URL placeholder so the booking flow works end-to-end
+  // 2. Check for configured permanent Google Meet link (e.g. personal creator meeting room)
+  const hostMeetUrl = process.env.GOOGLE_MEET_URL?.trim() || process.env.DEFAULT_MEET_URL?.trim();
+  if (hostMeetUrl) {
+    return {
+      success: true,
+      calendarEventId: `cal_permanent_${booking.bookingId}`,
+      googleMeetUrl: hostMeetUrl,
+      error: null,
+      isPermanentRoom: true,
+    };
+  }
+
+  // 3. Fallback placeholder
   return {
     success: true,
     calendarEventId: `cal_mock_${booking.bookingId}`,
@@ -109,8 +120,12 @@ export async function createMeetingEvent(booking) {
 /**
  * Generate a 1-click Google Calendar web URL with meeting link and details
  */
-export function generateGoogleCalendarUrl(booking) {
-  const title = encodeURIComponent(`1-on-1 Consultation: ${booking.customerName} & Harsha`);
+export function generateGoogleCalendarUrl(booking, forHost = false) {
+  const title = encodeURIComponent(
+    forHost
+      ? `1-on-1 Consultation: ${booking.customerName} (${booking.selectedTopic})`
+      : `1-on-1 Consultation: ${booking.customerName} & Harsha`
+  );
   const startUtc = new Date(booking.startTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
   const endUtc = new Date(booking.endTime).toISOString().replace(/-|:|\.\d\d\d/g, '');
   const meetUrl = booking.googleMeetUrl || '';
@@ -119,7 +134,8 @@ export function generateGoogleCalendarUrl(booking) {
     `Topic: ${booking.selectedTopic}\n` +
     `Google Meet: ${meetUrl}\n` +
     `Booking ID: ${booking.bookingId}\n` +
-    `Client: ${booking.customerName} (${booking.customerEmail})\n\n` +
+    `Client: ${booking.customerName} (${booking.customerEmail}${booking.customerPhone ? ` · ${booking.customerPhone}` : ''})\n\n` +
+    `What Client Shared:\n${booking.customerQuestions}\n\n` +
     `Reminder: Please be ready 5 minutes before the call starts.`
   );
   const location = encodeURIComponent(meetUrl || 'Google Meet (Online)');
