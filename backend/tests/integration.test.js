@@ -147,11 +147,16 @@ describe('End-to-End Booking Lifecycle & Concurrency Integration', () => {
     assert.ok(policy);
     assert.ok(policy.content.includes('Rescheduling'));
 
+    const originalContent = policy.content;
     // Update policy
     policy.content = policy.content + '\n\nUpdated for 2026.';
     await policy.save();
 
     const reloaded = await Policy.findOne({ type: 'cancellation_refund' });
     assert.ok(reloaded.content.includes('Updated for 2026.'));
+
+    // Restore original content so test does not mutate DB permanently
+    policy.content = originalContent;
+    await policy.save();
   });
 });

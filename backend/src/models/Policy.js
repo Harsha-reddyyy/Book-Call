@@ -93,10 +93,10 @@ Booking records and customer notes are maintained to assist with session follow-
 The 1-on-1 consultation with Harsha is an advisory and conversational session designed to answer questions, share creator experience, and discuss AI tools, content workflows, and video strategies. It does not constitute formal legal, financial, investment, or guaranteed commercial consulting.
 
 ### 2. Session Duration and Conduct
-Each consultation session lasts for exactly 20 minutes unless otherwise agreed. Both parties agree to maintain professional, respectful, and constructive conduct. Sessions will not be recorded without mutual explicit consent.
+Each consultation session is scheduled for 30–40 minutes unless otherwise agreed. Both parties agree to maintain professional, respectful, and constructive conduct. Sessions will not be recorded without mutual explicit consent.
 
 ### 3. Booking and Payment
-Bookings are confirmed only upon successful payment of ₹399 INR through our authorized payment gateway (Razorpay). Any slot held temporarily will be automatically released if payment is not completed within the reservation window.
+Bookings are confirmed only upon successful payment through our authorized payment gateway (Razorpay). The consultation fee is displayed clearly during booking. Any slot held temporarily will be automatically released if payment is not completed within the reservation window.
 
 ### 4. Changes to Terms
 We reserve the right to revise these terms or policies at any time. Changes will take effect immediately upon updating this page.`,
