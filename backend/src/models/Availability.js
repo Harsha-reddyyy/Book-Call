@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 const availabilitySchema = new mongoose.Schema(
   {
     // Available days of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    // Default: Mon to Sat (1, 2, 3, 4, 5, 6)
+    // Default: All 7 days (0, 1, 2, 3, 4, 5, 6)
     availableDays: {
       type: [Number],
-      default: [1, 2, 3, 4, 5, 6],
+      default: [0, 1, 2, 3, 4, 5, 6],
     },
     // Working hours in 24h format HH:mm (IST) - 10:00 AM to 8:00 PM (20:00)
     workingHoursStart: {
@@ -82,7 +82,7 @@ availabilitySchema.statics.getEffectiveSettings = async function () {
   let settings = await this.findOne();
   if (!settings) {
     settings = await this.create({
-      availableDays: [1, 2, 3, 4, 5, 6],
+      availableDays: [0, 1, 2, 3, 4, 5, 6],
       workingHoursStart: '10:00',
       workingHoursEnd: '19:00',
       sessionDuration: 20,

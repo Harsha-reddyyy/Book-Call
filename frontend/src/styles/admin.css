@@ -474,16 +474,23 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   background-color: var(--surface-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
+  font-family: inherit;
   font-size: 0.86rem;
   font-weight: 500;
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
   min-height: 40px;
   box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.day-checkbox-label:hover {
+  border-color: var(--accent);
 }
 
 .day-checkbox-label.selected {
@@ -491,6 +498,63 @@
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 600;
+}
+
+/* Availability Action Bar */
+.availability-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.availability-save-footer {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+/* Reschedule & Edit Booking Section */
+.reschedule-card {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.reschedule-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.reschedule-title {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reschedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 /* Policy Editor */

@@ -91,10 +91,18 @@ router.get('/bookings/:id', async (req, res, next) => {
   }
 });
 
-// PATCH /api/admin/bookings/:id/status - Update booking status or notes
+// PATCH /api/admin/bookings/:id/status - Update booking status, rescheduled date/time, phone, or notes
 router.patch('/bookings/:id/status', async (req, res, next) => {
   try {
-    const { bookingStatus, adminNotes, cancellationReason } = req.body;
+    const {
+      bookingStatus,
+      adminNotes,
+      cancellationReason,
+      startTime,
+      endTime,
+      customerPhone,
+      selectedTopic,
+    } = req.body;
     const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
@@ -109,6 +117,23 @@ router.patch('/bookings/:id/status', async (req, res, next) => {
     }
     if (cancellationReason !== undefined) {
       booking.cancellationReason = cancellationReason;
+    }
+    if (customerPhone !== undefined) {
+      booking.customerPhone = customerPhone.trim();
+    }
+    if (selectedTopic !== undefined) {
+      booking.selectedTopic = selectedTopic;
+    }
+    if (startTime) {
+      const newStart = new Date(startTime);
+      if (!isNaN(newStart.getTime())) {
+        booking.startTime = newStart;
+        if (endTime) {
+          booking.endTime = new Date(endTime);
+        } else {
+          booking.endTime = new Date(newStart.getTime() + 30 * 60 * 1000);
+        }
+      }
     }
 
     await booking.save();
@@ -211,6 +236,7 @@ router.put('/availability', async (req, res, next) => {
       minimumNoticeHours,
       maxAdvanceDays,
       priceInr,
+      originalPriceInr,
     } = req.body;
 
     let settings = await Availability.findOne();
@@ -228,6 +254,7 @@ router.put('/availability', async (req, res, next) => {
     if (minimumNoticeHours !== undefined) settings.minimumNoticeHours = minimumNoticeHours;
     if (maxAdvanceDays !== undefined) settings.maxAdvanceDays = maxAdvanceDays;
     if (priceInr !== undefined) settings.priceInr = priceInr;
+    if (originalPriceInr !== undefined) settings.originalPriceInr = originalPriceInr;
 
     await settings.save();
 

@@ -50,6 +50,14 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null);
 
+  // Booking edit / reschedule state
+  const [editDate, setEditDate] = useState('');
+  const [editTime, setEditTime] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editTopic, setEditTopic] = useState('');
+  const [savingBookingEdit, setSavingBookingEdit] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
+
   // Availability settings state
   const [availability, setAvailability] = useState(null);
   const [loadingSettings, setLoadingSettings] = useState(false);
@@ -223,9 +231,71 @@ export default function AdminDashboard() {
     }
   };
 
+  // Open booking detail drawer and pre-fill reschedule inputs
+  const handleOpenBookingDetails = (b) => {
+    setSelectedBooking(b);
+    if (b) {
+      const d = new Date(b.startTime);
+      const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+      const timeStr = d.toLocaleTimeString('en-GB', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      setEditDate(dateStr);
+      setEditTime(timeStr);
+      setEditPhone(b.customerPhone || '');
+      setEditTopic(b.selectedTopic || '');
+      setShowReschedule(false);
+    }
+  };
+
+  // Save rescheduled booking date/time and contact details
+  const handleSaveBookingEdit = async (e) => {
+    if (e) e.preventDefault();
+    if (!selectedBooking) return;
+    if (!editDate || !editTime) {
+      setToast({ type: 'error', message: 'Please specify both date and time.' });
+      return;
+    }
+
+    setSavingBookingEdit(true);
+    try {
+      const isoString = `${editDate}T${editTime}:00+05:30`;
+      const newStart = new Date(isoString);
+      if (isNaN(newStart.getTime())) {
+        throw new Error('Invalid date or time entered.');
+      }
+
+      const durationMin = availability?.sessionDuration || 20;
+      const newEnd = new Date(newStart.getTime() + durationMin * 60 * 1000);
+
+      const res = await api.updateBookingStatus(selectedBooking._id, {
+        startTime: newStart.toISOString(),
+        endTime: newEnd.toISOString(),
+        customerPhone: editPhone.trim(),
+        selectedTopic: editTopic.trim(),
+      });
+
+      if (res.success) {
+        setToast({ type: 'success', message: 'Booking rescheduled & updated successfully!' });
+        setSelectedBooking(res.booking);
+        setShowReschedule(false);
+        loadBookings();
+      } else {
+        setToast({ type: 'error', message: res.message || 'Failed to update booking.' });
+      }
+    } catch (err) {
+      setToast({ type: 'error', message: err.message || 'Error updating booking.' });
+    } finally {
+      setSavingBookingEdit(false);
+    }
+  };
+
   // Save availability
   const handleSaveAvailability = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setSavingSettings(true);
     try {
       const res = await api.updateAdminAvailability(availability);
@@ -248,21 +318,43 @@ export default function AdminDashboard() {
     setAvailability({ ...availability, availableDays: updated });
   };
 
+  const selectAllDays = () => {
+    if (!availability) return;
+    setAvailability({ ...availability, availableDays: [0, 1, 2, 3, 4, 5, 6] });
+    setToast({ type: 'success', message: 'All 7 days selected. Click Save Changes to apply.' });
+  };
+
+  const selectWeekdaysOnly = () => {
+    if (!availability) return;
+    setAvailability({ ...availability, availableDays: [1, 2, 3, 4, 5] });
+    setToast({ type: 'success', message: 'Mon – Fri selected. Click Save Changes to apply.' });
+  };
+
+  const selectMonSat = () => {
+    if (!availability) return;
+    setAvailability({ ...availability, availableDays: [1, 2, 3, 4, 5, 6] });
+    setToast({ type: 'success', message: 'Mon – Sat selected. Click Save Changes to apply.' });
+  };
+
   const addBlockedDate = () => {
     if (!newBlockedDate || !/^\d{4}-\d{2}-\d{2}$/.test(newBlockedDate)) {
       setToast({ type: 'error', message: 'Please select a valid date (YYYY-MM-DD).' });
       return;
     }
     const current = availability.blockedDates || [];
-    if (!current.includes(newBlockedDate)) {
-      setAvailability({ ...availability, blockedDates: [...current, newBlockedDate] });
-      setNewBlockedDate('');
+    if (current.includes(newBlockedDate)) {
+      setToast({ type: 'error', message: `${newBlockedDate} is already blocked.` });
+      return;
     }
+    setAvailability({ ...availability, blockedDates: [...current, newBlockedDate].sort() });
+    setToast({ type: 'success', message: `Added ${newBlockedDate} to blocked dates. Click Save Changes to apply.` });
+    setNewBlockedDate('');
   };
 
   const removeBlockedDate = (dateToRemove) => {
     const updated = (availability.blockedDates || []).filter((d) => d !== dateToRemove);
     setAvailability({ ...availability, blockedDates: updated });
+    setToast({ type: 'success', message: `Removed ${dateToRemove} from blocked dates. Click Save Changes to apply.` });
   };
 
   // Save policy
@@ -429,6 +521,7 @@ export default function AdminDashboard() {
                         {bookings.map((b) => {
                           const startDate = new Date(b.startTime);
                           const dateStr = startDate.toLocaleDateString('en-US', {
+                            weekday: 'short',
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
@@ -490,7 +583,7 @@ export default function AdminDashboard() {
                                 <button
                                   type="button"
                                   className="btn btn-secondary btn-sm"
-                                  onClick={() => setSelectedBooking(b)}
+                                  onClick={() => handleOpenBookingDetails(b)}
                                 >
                                   Details
                                 </button>
@@ -507,6 +600,7 @@ export default function AdminDashboard() {
                     {bookings.map((b) => {
                       const startDate = new Date(b.startTime);
                       const dateStr = startDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',
@@ -559,7 +653,7 @@ export default function AdminDashboard() {
                               type="button"
                               className="btn btn-secondary btn-sm"
                               style={{ flex: 1 }}
-                              onClick={() => setSelectedBooking(b)}
+                              onClick={() => handleOpenBookingDetails(b)}
                             >
                               View Details
                             </button>
@@ -596,29 +690,93 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <form onSubmit={handleSaveAvailability}>
+                {/* Top Action Bar */}
+                <div className="availability-top-bar">
+                  <div>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Availability & Schedule Settings</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Control working days, call hours, pricing, and blackout dates.
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={savingSettings}
+                  >
+                    {savingSettings ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      'Save Changes'
+                    )}
+                  </button>
+                </div>
+
                 <div className="settings-grid">
                   {/* Left Column: Schedule & Working Days */}
                   <div className="settings-card">
                     <h3 className="settings-card-title">Weekly Schedule & Working Hours</h3>
 
                     <label className="form-label">Available Days of the Week</label>
-                    <div className="days-selector">
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={selectAllDays}
+                        style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                      >
+                        ✓ Select All 7 Days
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={selectWeekdaysOnly}
+                        style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                      >
+                        Mon – Fri Only
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={selectMonSat}
+                        style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                      >
+                        Mon – Sat
+                      </button>
+                    </div>
+
+                    <div className="days-selector" role="group" aria-label="Available Days">
                       {WEEKDAYS.map((day) => {
                         const isChecked = (availability.availableDays || []).includes(day.id);
                         return (
-                          <label
+                          <button
                             key={day.id}
+                            type="button"
                             className={`day-checkbox-label ${isChecked ? 'selected' : ''}`}
                             onClick={() => toggleDay(day.id)}
+                            aria-pressed={isChecked}
                           >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {}}
-                              style={{ display: 'none' }}
-                            />
+                            <span
+                              style={{
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '3px',
+                                border: isChecked ? 'none' : '1.5px solid var(--border-color)',
+                                backgroundColor: isChecked ? 'var(--accent)' : 'transparent',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontSize: '11px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {isChecked ? '✓' : ''}
+                            </span>
                             <span>{day.name}</span>
-                          </label>
+                          </button>
                         );
                       })}
                     </div>
@@ -687,21 +845,39 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    <div className="form-group">
-                      <label className="form-label">Consultation Fee (₹ INR)</label>
-                      <input
-                        type="number"
-                        className="form-input"
-                        value={availability.priceInr || 399}
-                        onChange={(e) =>
-                          setAvailability({
-                            ...availability,
-                            priceInr: parseInt(e.target.value, 10),
-                          })
-                        }
-                        min={1}
-                        required
-                      />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Consultation Fee (₹ INR)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          value={availability.priceInr ?? 399}
+                          onChange={(e) =>
+                            setAvailability({
+                              ...availability,
+                              priceInr: parseInt(e.target.value, 10),
+                            })
+                          }
+                          min={1}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Original Fee (Strike-through ₹ INR)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          value={availability.originalPriceInr ?? 499}
+                          onChange={(e) =>
+                            setAvailability({
+                              ...availability,
+                              originalPriceInr: parseInt(e.target.value, 10),
+                            })
+                          }
+                          min={1}
+                        />
+                        <div className="form-hint">Shown crossed-out to highlight discount.</div>
+                      </div>
                     </div>
                   </div>
 
@@ -715,7 +891,7 @@ export default function AdminDashboard() {
                         <input
                           type="number"
                           className="form-input"
-                          value={availability.minimumNoticeHours || 2}
+                          value={availability.minimumNoticeHours ?? 2}
                           onChange={(e) =>
                             setAvailability({
                               ...availability,
@@ -726,7 +902,7 @@ export default function AdminDashboard() {
                           max={48}
                           required
                         />
-                        <div className="form-hint">Prevent last-minute surprises.</div>
+                        <div className="form-hint">Prevent last-minute bookings.</div>
                       </div>
 
                       <div className="form-group">
@@ -734,7 +910,7 @@ export default function AdminDashboard() {
                         <input
                           type="number"
                           className="form-input"
-                          value={availability.maxAdvanceDays || 30}
+                          value={availability.maxAdvanceDays ?? 30}
                           onChange={(e) =>
                             setAvailability({
                               ...availability,
@@ -758,6 +934,12 @@ export default function AdminDashboard() {
                           className="form-input"
                           value={newBlockedDate}
                           onChange={(e) => setNewBlockedDate(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addBlockedDate();
+                            }
+                          }}
                         />
                         <button
                           type="button"
@@ -772,7 +954,7 @@ export default function AdminDashboard() {
                       {availability.blockedDates && availability.blockedDates.length > 0 ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                           {availability.blockedDates.map((d) => (
-                            <span key={d} className="badge badge-neutral" style={{ padding: '6px 10px' }}>
+                            <span key={d} className="badge badge-neutral" style={{ padding: '6px 10px', fontSize: '0.86rem' }}>
                               <span>{d}</span>
                               <button
                                 type="button"
@@ -781,30 +963,44 @@ export default function AdminDashboard() {
                                   background: 'none',
                                   border: 'none',
                                   cursor: 'pointer',
-                                  marginLeft: '4px',
+                                  marginLeft: '6px',
                                   color: 'var(--danger)',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
                                 }}
+                                title="Unblock date"
                               >
-                                <X size={13} />
+                                <X size={14} />
                               </button>
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <div className="form-hint">No individual dates currently blocked.</div>
+                        <div className="form-hint">No individual dates currently blocked. Select a date above to block.</div>
                       )}
                     </div>
-
-                    <div style={{ marginTop: '36px' }}>
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={savingSettings}
-                      >
-                        {savingSettings ? 'Saving Settings...' : 'Save Availability Changes'}
-                      </button>
-                    </div>
                   </div>
+                </div>
+
+                {/* Bottom Action Footer */}
+                <div className="availability-save-footer">
+                  <span style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
+                    Remember to save after toggling days or blocking dates.
+                  </span>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={savingSettings}
+                  >
+                    {savingSettings ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>Saving Settings...</span>
+                      </>
+                    ) : (
+                      'Save Availability Changes'
+                    )}
+                  </button>
                 </div>
               </form>
             )}
@@ -959,6 +1155,97 @@ export default function AdminDashboard() {
                   {selectedBooking.razorpayOrderId || '—'}
                 </div>
               </div>
+            </div>
+
+            {/* Reschedule / Edit Booking Date & Details */}
+            <div className="reschedule-card">
+              <div className="reschedule-header">
+                <div className="reschedule-title">
+                  <Calendar size={16} style={{ color: 'var(--accent)' }} />
+                  <span>Reschedule Call / Edit Booking</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setShowReschedule(!showReschedule)}
+                  style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                >
+                  {showReschedule ? 'Cancel / Close' : 'Reschedule Date & Time'}
+                </button>
+              </div>
+
+              {showReschedule ? (
+                <form onSubmit={handleSaveBookingEdit} style={{ marginTop: '12px' }}>
+                  <div className="reschedule-grid">
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>New Date (IST)</label>
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={editDate}
+                        onChange={(e) => setEditDate(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>New Start Time (IST)</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={editTime}
+                        onChange={(e) => setEditTime(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>Phone / WhatsApp</label>
+                      <input
+                        type="tel"
+                        className="form-input"
+                        value={editPhone}
+                        onChange={(e) => setEditPhone(e.target.value)}
+                        placeholder="+91..."
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>Topic</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={editTopic}
+                        onChange={(e) => setEditTopic(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '12px' }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setShowReschedule(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-sm"
+                      disabled={savingBookingEdit}
+                    >
+                      {savingBookingEdit ? (
+                        <>
+                          <Loader2 size={13} className="animate-spin" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : (
+                        'Save Rescheduled Date & Time'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
+                  Need to change the date or time? Click <strong>Reschedule Date & Time</strong> above to pick a new date/time or update contact info.
+                </div>
+              )}
             </div>
 
             {/* Google Meet Link */}
