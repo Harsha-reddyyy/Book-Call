@@ -74,6 +74,13 @@ export default function AdminDashboard() {
   const [toast, setToast] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Customer records delete & cleanup state
+  const [bookingToDelete, setBookingToDelete] = useState(null);
+  const [deletingBooking, setDeletingBooking] = useState(false);
+  const [showCleanupModal, setShowCleanupModal] = useState(false);
+  const [cleanupScope, setCleanupScope] = useState('cancelled_expired');
+  const [cleaningUp, setCleaningUp] = useState(false);
+
   // Check auth on load
   useEffect(() => {
     const token = localStorage.getItem('harsha_admin_token');
@@ -228,6 +235,51 @@ export default function AdminDashboard() {
       setToast({ type: 'error', message: err.message });
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  // Delete a single booking
+  const handleConfirmDelete = async () => {
+    if (!bookingToDelete) return;
+    setDeletingBooking(true);
+    try {
+      const res = await api.deleteBooking(bookingToDelete._id);
+      if (res.success) {
+        setToast({ type: 'success', message: res.message || 'Booking deleted successfully.' });
+        if (selectedBooking && selectedBooking._id === bookingToDelete._id) {
+          setSelectedBooking(null);
+        }
+        setBookingToDelete(null);
+        loadBookings();
+      } else {
+        setToast({ type: 'error', message: res.message || 'Failed to delete booking.' });
+      }
+    } catch (err) {
+      setToast({ type: 'error', message: err.message || 'Error deleting booking.' });
+    } finally {
+      setDeletingBooking(false);
+    }
+  };
+
+  // Bulk cleanup customer records
+  const handleConfirmCleanup = async () => {
+    setCleaningUp(true);
+    try {
+      const res = await api.cleanupBookings(cleanupScope);
+      if (res.success) {
+        setToast({
+          type: 'success',
+          message: res.message || `Cleaned up ${res.deletedCount} booking(s).`,
+        });
+        setShowCleanupModal(false);
+        loadBookings();
+      } else {
+        setToast({ type: 'error', message: res.message || 'Failed to clean up records.' });
+      }
+    } catch (err) {
+      setToast({ type: 'error', message: err.message || 'Error cleaning up records.' });
+    } finally {
+      setCleaningUp(false);
     }
   };
 
@@ -388,6 +440,23 @@ export default function AdminDashboard() {
 
           {/* User Actions */}
           <div className="admin-user-actions">
+            <button
+              type="button"
+              onClick={() => setShowCleanupModal(true)}
+              className="btn btn-secondary btn-sm admin-delete-btn"
+              title="Clean up / Delete customer records"
+              style={{
+                color: '#ef4444',
+                borderColor: 'rgba(239, 68, 68, 0.3)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Trash2 size={14} />
+              <span className="sign-out-btn-text">Clean Records</span>
+            </button>
+
             <span className="admin-user-name">
               <strong>{adminUser?.username || 'Admin'}</strong>
             </span>
@@ -477,7 +546,17 @@ export default function AdminDashboard() {
               </div>
 
               {/* Actions */}
-              <div className="toolbar-actions">
+              <div className="toolbar-actions" style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCleanupModal(true)}
+                  className="btn btn-secondary btn-sm"
+                  style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                  title="Clean up / Delete customer records"
+                >
+                  <Trash2 size={14} />
+                  <span>Clean Records</span>
+                </button>
                 <button
                   type="button"
                   onClick={api.exportBookingsCsv}
@@ -580,13 +659,24 @@ export default function AdminDashboard() {
                                 )}
                               </td>
                               <td>
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary btn-sm"
-                                  onClick={() => handleOpenBookingDetails(b)}
-                                >
-                                  Details
-                                </button>
+                                <div style={{ display: 'flex', gap: '6px' }}>
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={() => handleOpenBookingDetails(b)}
+                                  >
+                                    Details
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ color: '#ef4444', padding: '6px 8px' }}
+                                    onClick={() => setBookingToDelete(b)}
+                                    title={`Delete booking ${b.bookingId}`}
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -669,6 +759,15 @@ export default function AdminDashboard() {
                                 <ExternalLink size={13} />
                               </a>
                             )}
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm"
+                              style={{ color: '#ef4444', padding: '6px 10px' }}
+                              onClick={() => setBookingToDelete(b)}
+                              title="Delete booking"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         </div>
                       );
@@ -1342,7 +1441,238 @@ export default function AdminDashboard() {
                     Mark as Completed
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  style={{ color: '#ef4444', borderColor: '#FFCDD2' }}
+                  onClick={() => setBookingToDelete(selectedBooking)}
+                  disabled={actionLoading}
+                >
+                  <Trash2 size={13} />
+                  <span>Delete Record</span>
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Single Booking Delete Confirmation Modal */}
+      {bookingToDelete && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '480px' }}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Trash2 size={20} style={{ color: '#ef4444' }} />
+                <h3 className="modal-title" style={{ margin: 0 }}>Delete Customer Record</h3>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setBookingToDelete(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '16px', lineHeight: 1.5 }}>
+              Are you sure you want to permanently delete this customer booking? This cannot be undone.
+            </p>
+
+            <div
+              style={{
+                backgroundColor: 'var(--surface-subtle)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '12px 14px',
+                marginBottom: '20px',
+                fontSize: '0.88rem',
+              }}
+            >
+              <div><strong>Booking ID:</strong> {bookingToDelete.bookingId}</div>
+              <div style={{ marginTop: '4px' }}><strong>Customer:</strong> {bookingToDelete.customerName} ({bookingToDelete.customerEmail})</div>
+              {bookingToDelete.customerPhone && (
+                <div style={{ marginTop: '4px' }}><strong>Phone:</strong> {bookingToDelete.customerPhone}</div>
+              )}
+              <div style={{ marginTop: '4px' }}>
+                <strong>Scheduled:</strong>{' '}
+                {new Date(bookingToDelete.startTime).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })} IST
+              </div>
+              <div style={{ marginTop: '4px' }}>
+                <strong>Status:</strong> <span className={`status-pill status-${bookingToDelete.bookingStatus}`}>{bookingToDelete.bookingStatus}</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setBookingToDelete(null)}
+                disabled={deletingBooking}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}
+                onClick={handleConfirmDelete}
+                disabled={deletingBooking}
+              >
+                {deletingBooking ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>Delete Permanently</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Database Cleanup / Bulk Delete Modal */}
+      {showCleanupModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '520px' }}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Trash2 size={20} style={{ color: '#ef4444' }} />
+                <h3 className="modal-title" style={{ margin: 0 }}>Clean Up Customer Records</h3>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setShowCleanupModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '16px', lineHeight: 1.5 }}>
+              Free up database storage and keep your dashboard clean by removing past, cancelled, or inactive customer bookings.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  padding: '12px',
+                  border: `1.5px solid ${cleanupScope === 'cancelled_expired' ? 'var(--accent)' : 'var(--border-color)'}`,
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: cleanupScope === 'cancelled_expired' ? 'var(--accent-light)' : 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="cleanupScope"
+                  value="cancelled_expired"
+                  checked={cleanupScope === 'cancelled_expired'}
+                  onChange={() => setCleanupScope('cancelled_expired')}
+                  style={{ marginTop: '3px' }}
+                />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>Cancelled & Expired Bookings (Recommended)</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    Removes bookings that were cancelled or timed out during checkout. Safest cleanup.
+                  </div>
+                </div>
+              </label>
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  padding: '12px',
+                  border: `1.5px solid ${cleanupScope === 'completed' ? 'var(--accent)' : 'var(--border-color)'}`,
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: cleanupScope === 'completed' ? 'var(--accent-light)' : 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="cleanupScope"
+                  value="completed"
+                  checked={cleanupScope === 'completed'}
+                  onChange={() => setCleanupScope('completed')}
+                  style={{ marginTop: '3px' }}
+                />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>Completed Bookings</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    Removes past calls that have already concluded.
+                  </div>
+                </div>
+              </label>
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  padding: '12px',
+                  border: `1.5px solid ${cleanupScope === 'all' ? '#ef4444' : 'var(--border-color)'}`,
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: cleanupScope === 'all' ? 'rgba(239, 68, 68, 0.08)' : 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="cleanupScope"
+                  value="all"
+                  checked={cleanupScope === 'all'}
+                  onChange={() => setCleanupScope('all')}
+                  style={{ marginTop: '3px' }}
+                />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.92rem', color: '#ef4444' }}>All Booking Records (Reset Database)</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    Permanently deletes all customer booking records. Use for a fresh start.
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowCleanupModal(false)}
+                disabled={cleaningUp}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}
+                onClick={handleConfirmCleanup}
+                disabled={cleaningUp}
+              >
+                {cleaningUp ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Cleaning Up...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>Delete Selected Records</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

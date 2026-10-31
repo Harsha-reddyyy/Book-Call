@@ -148,6 +148,57 @@ router.patch('/bookings/:id/status', async (req, res, next) => {
   }
 });
 
+// DELETE /api/admin/bookings/cleanup - Clean up / bulk delete customer bookings
+router.delete('/bookings/cleanup', async (req, res, next) => {
+  try {
+    const { scope } = req.query; // 'cancelled_expired' | 'completed' | 'all'
+    let filter = {};
+
+    if (scope === 'cancelled_expired') {
+      filter = { bookingStatus: { $in: ['cancelled', 'expired'] } };
+    } else if (scope === 'completed') {
+      filter = { bookingStatus: 'completed' };
+    } else if (scope === 'all') {
+      filter = {};
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid cleanup scope. Must be "cancelled_expired", "completed", or "all".',
+      });
+    }
+
+    const result = await Booking.deleteMany(filter);
+
+    res.json({
+      success: true,
+      message: `Successfully deleted ${result.deletedCount} booking record(s).`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/bookings/:id - Delete a single customer booking
+router.delete('/bookings/:id', async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found.' });
+    }
+
+    await Booking.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: `Booking ${booking.bookingId} deleted successfully.`,
+      deletedId: req.params.id,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/admin/bookings/:id/retry-calendar - Retry Google Calendar / Meet creation
 router.post('/bookings/:id/retry-calendar', async (req, res, next) => {
   try {

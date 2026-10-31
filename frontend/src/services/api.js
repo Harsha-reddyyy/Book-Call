@@ -123,6 +123,22 @@ export const api = {
     return handleResponse(res);
   },
 
+  async deleteBooking(id) {
+    const res = await fetch(`${API_BASE_URL}/admin/bookings/${id}`, {
+      method: 'DELETE',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse(res);
+  },
+
+  async cleanupBookings(scope = 'cancelled_expired') {
+    const res = await fetch(`${API_BASE_URL}/admin/bookings/cleanup?scope=${encodeURIComponent(scope)}`, {
+      method: 'DELETE',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse(res);
+  },
+
   // Admin Availability
   async getAdminAvailability() {
     const res = await fetch(`${API_BASE_URL}/admin/availability`, {
